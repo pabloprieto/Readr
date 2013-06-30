@@ -1,0 +1,46 @@
+<div class="app">
+
+	<header class="app-header app-navbar">
+
+		<h1>
+			Readr
+		</h1>
+
+	</header>
+	
+	<div class="app-body">
+	
+		<form class="form-login" action="<?= $this->basePath('login') ?>" method="post">
+		
+			<?php if (count($this->errors)): ?>
+			<p class="error alert-block">
+				<?= implode('<br/>', $this->errors) ?>
+			</p>
+			<?php endif; ?>
+		
+			<div class="form-item">
+				<label class="form-label">Username</label>
+				<div class="controls">
+				    <input type="text" name="username"/>
+				</div>    				
+			</div>
+			
+			<div class="form-item">
+				<label class="form-label">Password</label>
+				<div class="controls">
+				    <input type="password" name="password"/>
+				</div>
+			</div>
+			
+			<div class="form-item">
+				<div class="controls">
+				    <div class="error error-block"></div>
+				    <button type="submit" class="btn btn-primary">Login</button>
+				</div>
+			</div>
+		
+		</form>
+	
+	</div>
+	
+</div>
