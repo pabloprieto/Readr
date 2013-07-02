@@ -38,12 +38,12 @@ class App
 	
 	public static function getRelease()
 	{
-		return array(0,5,0);
+		return array(0,5,1);
 	}
 	
 	public static function getVersion()
 	{
-		return 2013070101;
+		return 20130703;
 	}
 
 	protected function route()

@@ -49,6 +49,9 @@ Pablo Prieto, [pabloprieto.net](http://pabloprieto.net/)
 
 ## Changelog
 
-* **v0.5** - Initial version
+* **v0.5.1**
+	- Security fix
+* **v0.5**
+	- Initial version
 
 
