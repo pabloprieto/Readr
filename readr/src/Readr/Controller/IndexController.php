@@ -1,4 +1,11 @@
 <?php
+/**
+ * Readr
+ *
+ * @link    http://github.com/pabloprieto/Readr
+ * @author  Pablo Prieto
+ * @license http://opensource.org/licenses/GPL-3.0
+ */
 
 namespace Readr\Controller;
 
@@ -7,7 +14,9 @@ class IndexController extends AbstractController
 
 	public function init()
 	{
-		$this->checkAuth();
+		if (!$this->checkAuth()) {
+			$this->redirect('login');
+		}
 	}
 
 	public function indexAction()

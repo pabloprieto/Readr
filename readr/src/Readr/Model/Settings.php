@@ -1,4 +1,11 @@
 <?php
+/**
+ * Readr
+ *
+ * @link    http://github.com/pabloprieto/Readr
+ * @author  Pablo Prieto
+ * @license http://opensource.org/licenses/GPL-3.0
+ */
 
 namespace Readr\Model;
 

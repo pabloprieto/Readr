@@ -1,4 +1,11 @@
 <?php
+/**
+ * Readr
+ *
+ * @link    http://github.com/pabloprieto/Readr
+ * @author  Pablo Prieto
+ * @license http://opensource.org/licenses/GPL-3.0
+ */
 
 namespace Readr\Model;
 
@@ -18,8 +25,7 @@ class Entries extends AbstractModel
 			':id'  => $id
 		));
 
-		$row = $statement->fetch(PDO::FETCH_ASSOC);
-		return empty($row['id']) ? null : $row;
+		return $statement->fetch(PDO::FETCH_ASSOC);
 	}
 
 	public function fetchAll($limit = 50, $offset = 0, $filters = array())

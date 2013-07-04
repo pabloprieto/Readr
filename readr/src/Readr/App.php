@@ -1,4 +1,11 @@
 <?php
+/**
+ * Readr
+ *
+ * @link    http://github.com/pabloprieto/Readr
+ * @author  Pablo Prieto
+ * @license http://opensource.org/licenses/GPL-3.0
+ */
 
 namespace Readr;
 
@@ -7,25 +14,40 @@ use Readr\Model\Settings;
 
 class App
 {
+	
+	/**
+	 * @var string
+	 */
 	protected static $basePath;
+	
+	/**
+	 * @var ServiceManager
+	 */
 	protected $serviceManager;
 
+	/**
+	 * @return void
+	 */
 	public function run()
 	{
-		$this->serviceManager = new ServiceManager;
-		
-		$this->initDb();
-		$this->initSettings();
 		$this->checkInstall();
 		
 		try {
-			$this->route();
+			
+			$response = $this->route();
+			echo $response;
+			
 		} catch (\Exception $e) {
+		
 			header($_SERVER['SERVER_PROTOCOL'] . ' ' . $e->getCode());
 			die($e->getMessage());
+			
 		}
 	}
 
+	/**
+	 * @return string
+	 */
 	public static function getBasePath()
 	{
 		if (!self::$basePath) {
@@ -36,16 +58,26 @@ class App
 		return self::$basePath;
 	}
 	
+	/**
+	 * @return string
+	 */
 	public static function getRelease()
 	{
 		return array(0,5,1);
 	}
 	
+	/**
+	 * @return int
+	 */
 	public static function getVersion()
 	{
-		return 20130703;
+		return 2013070201;
 	}
 
+	/**
+	 * @return string|false
+	 * @throws \RuntimeException
+	 */
 	protected function route()
 	{
 		$path = $this->getPathInfo();
@@ -72,7 +104,7 @@ class App
 			throw new \Exception("Page not found", 404);
 		}
 
-		$controller = new $class($this->serviceManager);
+		$controller = new $class($this->getServiceManager());
 		$method = $actionName . 'Action';
 
 		if (!method_exists($controller, $method)) {
@@ -83,7 +115,7 @@ class App
 
 		if (is_string($response)) {
 
-			echo $response;
+			return $response;
 
 		} elseif (is_array($response) || is_null($response)) {
 
@@ -95,34 +127,20 @@ class App
 				'content' => $view->render()
 			));
 
-			echo $layout->render();
+			return $layout->render();
 
 		}
-	}
-	
-	protected function initDb()
-	{
-		if (!is_dir('data')) {
-			mkdir('data', 0755);
-		}
-	
-		$db = new PDO('sqlite:data/reader.db');
-		$db->exec('PRAGMA foreign_keys=ON');
 		
-		$this->serviceManager->set('db', $db);
-	}
-	
-	protected function initSettings()
-	{
-		$db = $this->serviceManager->get('db');
-		$settings = new Settings($db);
-		
-		$this->serviceManager->set('settings', $settings);
+		return false;
 	}
 
+	/**
+	 * @return bool
+	 */
 	protected function checkInstall()
 	{
-		$db = $this->serviceManager->get('db');
+		$sm = $this->getServiceManager();
+		$db = $sm->get('db');
 		
 		$statement = $db->query("SELECT COUNT(*) FROM sqlite_master WHERE type='table'");
 		$count = (int) $statement->fetchColumn(0);
@@ -165,7 +183,7 @@ class App
 				"value" TEXT)'
 			);
 			
-			$settings = $this->serviceManager->get('settings');
+			$settings = $sm->get('settings');
 			$settings->set('version', self::getVersion());
 			
 			return false;
@@ -175,6 +193,49 @@ class App
 		return true;
 	}
 
+	/**
+	 * @return ServiceManager
+	 */
+	protected function getServiceManager()
+	{
+		if (!$this->serviceManager) {
+			$this->serviceManager = new ServiceManager(array(
+				
+				'db' => function($sm) {
+					$db = new PDO('sqlite:data/reader.db');
+					$db->exec('PRAGMA foreign_keys=ON');
+					return $db;
+				},
+				
+				'settings' => function($sm) {
+					$db = $sm->get('db');
+					return new Model\Settings($db);
+				},
+				
+				'feeds' => function($sm) {
+					$db = $sm->get('db');
+					return new Model\Feeds($db);
+				},
+				
+				'entries' => function($sm) {
+					$db = $sm->get('db');
+					return new Model\Entries($db);
+				},
+				
+				'tags' => function($sm) {
+					$db = $sm->get('db');
+					return new Model\Tags($db);
+				}
+				
+			));
+		}
+		
+		return $this->serviceManager;
+	}
+
+	/**
+	 * @return string
+	 */
 	protected function getPathInfo()
 	{
 		if (isset($_SERVER['PATH_INFO'])) {

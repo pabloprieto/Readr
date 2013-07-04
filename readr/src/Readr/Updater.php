@@ -1,4 +1,11 @@
 <?php
+/**
+ * Readr
+ *
+ * @link    http://github.com/pabloprieto/Readr
+ * @author  Pablo Prieto
+ * @license http://opensource.org/licenses/GPL-3.0
+ */
 
 namespace Readr;
 
@@ -9,15 +16,31 @@ use Readr\Model\Feeds;
 class Updater
 {
 
+	/**
+	 * @var Feeds
+	 */
 	protected $feedsModel;
+	
+	/**
+	 * @var Entries
+	 */
 	protected $entriesModel;
 
+	/**
+	 * @param Feeds $feedsModel
+	 * @param Entries $entriesModel
+	 * @return void
+	 */
 	public function __construct(Feeds $feedsModel, Entries $entriesModel)
 	{
 		$this->feedsModel   = $feedsModel;
 		$this->entriesModel = $entriesModel;
 	}
 
+	/**
+	 * @param int $limit (default: 1000)
+	 * @return void
+	 */
 	public function update($limit = 1000)
 	{
 		@set_time_limit(600);

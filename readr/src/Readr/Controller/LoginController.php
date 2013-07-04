@@ -1,4 +1,11 @@
 <?php
+/**
+ * Readr
+ *
+ * @link    http://github.com/pabloprieto/Readr
+ * @author  Pablo Prieto
+ * @license http://opensource.org/licenses/GPL-3.0
+ */
 
 namespace Readr\Controller;
 
@@ -34,9 +41,14 @@ class LoginController extends AbstractController
 	{
 		session_start();
 		unset($_SESSION['username']);
-		return $this->redirect();
+		$this->redirect();
 	}
 	
+	/**
+	 * @param string $username
+	 * @param string $password
+	 * @return bool
+	 */
 	protected function checkCredentials($username, $password)
 	{
 		$settings = $this->getServiceManager()->get('settings');

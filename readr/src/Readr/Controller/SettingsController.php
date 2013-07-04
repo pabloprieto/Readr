@@ -1,4 +1,11 @@
 <?php
+/**
+ * Readr
+ *
+ * @link    http://github.com/pabloprieto/Readr
+ * @author  Pablo Prieto
+ * @license http://opensource.org/licenses/GPL-3.0
+ */
 
 namespace Readr\Controller;
 
@@ -10,7 +17,9 @@ class SettingsController extends AbstractController
 	
 	public function init()
 	{
-		$this->checkAuth();
+		if (!$this->checkAuth()) {
+			$this->redirect('login');
+		}
 	}
 	
 	public function indexAction()
@@ -66,7 +75,7 @@ class SettingsController extends AbstractController
 		$file = $this->getFile('file');
 	
 		if (!$file || $file['error'] > 0) {
-			return $this->redirect('settings');
+			$this->redirect('settings');
 		}	
 			
 		$subscriptions = simplexml_load_file($file['tmp_name']);
@@ -85,17 +94,20 @@ class SettingsController extends AbstractController
 			$type = (string) $outline->attributes()->type;
 
 			if ($type == 'rss') {
+			
+				$feedsModel = $this->getServiceManager()->get('feeds');
 
-				$result = $this->getFeedsModel()->insert(
+				$result = $feedsModel->insert(
 					(string) $outline->attributes()->title,
 					(string) $outline->attributes()->xmlUrl,
 					(string) $outline->attributes()->htmlUrl
 				);
 
 				if ($result && $title) {
-					$this->getTagsModel()->insert(
+					$tagsModel = $this->getServiceManager()->get('tags');
+					$tagsModel->insert(
 						$title,
-						$this->getFeedsModel()->lastInsertId()
+						$feedsModel->lastInsertId()
 					);
 				}
 
@@ -110,9 +122,12 @@ class SettingsController extends AbstractController
 
 	protected function updateFeeds()
 	{
+		$feedsModel   = $this->getServiceManager()->get('feeds');
+		$entriesModel = $this->getServiceManager()->get('entries');
+	
 		$updater = new Updater(
-			$this->getFeedsModel(),
-			$this->getEntriesModel()
+			$feedsModel,
+			$entriesModel
 		);
 		
 		$updater->update(1000);

@@ -1,4 +1,11 @@
 <?php
+/**
+ * Readr
+ *
+ * @link    http://github.com/pabloprieto/Readr
+ * @author  Pablo Prieto
+ * @license http://opensource.org/licenses/GPL-3.0
+ */
 
 namespace Readr\Model;
 
@@ -9,7 +16,7 @@ class Feeds extends AbstractModel
 
 	public function fetch($id)
 	{
-		$sql = "SELECT feeds.*, GROUP_CONCAT(tags.name,',') AS tags FROM feeds 
+		$sql = "SELECT feeds.*, COALESCE(tags.name,',') AS tags FROM feeds 
 		        LEFT JOIN tags ON tags.feed_id = feeds.id 
 		        WHERE id = :id LIMIT 1";
 
@@ -18,15 +25,14 @@ class Feeds extends AbstractModel
 			':id'  => $id
 		));
 
-		$row = $statement->fetch(PDO::FETCH_ASSOC);
-		return empty($row) ? null : $row;
+		return $statement->fetch(PDO::FETCH_ASSOC);
 	}
 
 	public function fetchAll($limit = -1, $offset = 0, $order = 'title ASC')
 	{
 		$sql = "SELECT 
 		        feeds.*, 
-		        (SELECT GROUP_CONCAT(tags.name) FROM tags WHERE tags.feed_id = feeds.id) AS tags,
+		        (SELECT COALESCE(tags.name, ',') FROM tags WHERE tags.feed_id = feeds.id) AS tags,
 		        COUNT(entries.id) AS entries_count,
 		        SUM(CASE WHEN entries.read = 0 THEN 1 ELSE 0 END) AS unread_count
 		        FROM feeds 
