@@ -79,7 +79,6 @@ this.readr = this.readr||{};
 				},
 				success: function(data) {
 					view.trigger('added', this);
-					console.info(data);
 					view.close();
 				},
 				error: function(data) {
