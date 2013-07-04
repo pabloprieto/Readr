@@ -512,7 +512,7 @@ this.readr = this.readr||{};
 			var unclassified = new Array;
 			
 			this.feeds.each(function(feed) {
-				if (feed.get('tags') == null) {
+				if (!feed.get('tags')) {
 					unclassified.push(feed);
 					return;
 				}
