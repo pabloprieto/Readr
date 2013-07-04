@@ -2,8 +2,8 @@
 /**
  * Readr
  *
- * @link    http://github.com/pabloprieto/Readr
- * @author  Pablo Prieto
+ * @link	http://github.com/pabloprieto/Readr
+ * @author	Pablo Prieto
  * @license http://opensource.org/licenses/GPL-3.0
  */
 
@@ -26,13 +26,13 @@ class ApiController extends AbstractController
 	public function feedsAction($id = null)
 	{
 		header('Content-type: application/json');
-	
+
 		$method = $this->getHttpMethod();
 		$model  = $this->getServiceManager()->get('feeds');
-		
+
 		if ($id) {
 			$feed = $model->fetch($id);
-								
+
 			if (!$feed) {
 				throw new \Exception(json_encode(array(
 					'error' => 'Feed not found'
@@ -47,11 +47,11 @@ class ApiController extends AbstractController
 				if ($id) {
 					$data = $this->getInputData();
 					$result = $model->update(
-						$id, 
-						$data['title'], 
+						$id,
+						$data['title'],
 						$data['url']
 					);
-					
+
 					if ($data['tags']) {
 						$tags = explode(',', $data['tags']);
 						$tagsModel = $this->getServiceManager()->get('tags');
@@ -66,45 +66,45 @@ class ApiController extends AbstractController
 
 			case 'post':
 				$data = $this->getInputData();
-				
+
 				$simplePie = new SimplePie();
 				$simplePie->enable_cache(false);
 				$simplePie->set_feed_url($data['url']);
 				$result = $simplePie->init();
-				
+
 				if (!$result) {
 					throw new \Exception(json_encode(array(
 						 'error' => $simplePie->error()
 					)), 400);
 				}
-					
+
 				if ($feeds = $simplePie->get_all_discovered_feeds()) {
 					if (is_array($feeds)) $feed = $feeds[0];
 					else $feed = $feeds;
-					
+
 					$simplePie->set_file($feed);
 					$simplePie->init();
-					
+
 					$data['url'] = $feed->url;
 				}
-				
+
 				$data['title'] = $simplePie->get_title();
 				$data['link']  = $simplePie->get_permalink();
-				
+
 				$result = $model->insert(
-					$data['title'], 
+					$data['title'],
 					$data['url'],
 					$data['link']
 				);
-				
+
 				if (!$result) {
 					throw new \Exception(json_encode(array(
 						 'error' => 'A feed with the same url is already registered'
 					)), 400);
 				}
-				
+
 				$id = $model->lastInsertId();
-				
+
 				if ($data['tags']) {
 					$tags = explode(',', $data['tags']);
 					$tagsModel = $this->getServiceManager()->get('tags');
@@ -112,7 +112,7 @@ class ApiController extends AbstractController
 						$tagsModel->insert($tag, $id);
 					}
 				}
-				
+
 				$items = $simplePie->get_items();
 
 				foreach ($items as $item) {
@@ -129,12 +129,12 @@ class ApiController extends AbstractController
 						$item->get_date('U')
 					);
 				}
-				
+
 				$model->setUpdateData(
-					$id, 
+					$id,
 					time()
 				);
-				
+
 				$feed = $model->fetch($id);
 				return json_encode($feed);
 
@@ -155,21 +155,21 @@ class ApiController extends AbstractController
 				}
 
 		}
-		
+
 		return false;
 	}
 
 	public function tagsAction($name = null)
 	{
 		header('Content-type: application/json');
-	
+
 		$method = $this->getHttpMethod();
 		$model  = $this->getServiceManager()->get('tags');
-		
+
 		if ($name) {
 			$name = urldecode($name);
-			$tag  = $model->fetch($name);
-			
+			$tag	 = $model->fetch($name);
+
 			if (!$tag) {
 				throw new \Exception(json_encode(array(
 					'error' => 'Tag not found'
@@ -193,7 +193,7 @@ class ApiController extends AbstractController
 					$name = urldecode($name);
 					$model->delete($name);
 				}
-				
+
 				break;
 
 			case 'get':
@@ -206,20 +206,20 @@ class ApiController extends AbstractController
 				}
 
 		}
-		
+
 		return false;
 	}
 
 	public function entriesAction($id = null)
 	{
 		header('Content-type: application/json');
-	
+
 		$method = $this->getHttpMethod();
 		$model  = $this->getServiceManager()->get('entries');
-		
+
 		if ($id) {
 			$entry = $model->fetch($id);
-		
+
 			if (!$entry) {
 				throw new \Exception(json_encode(array(
 					'error' => 'Entry not found'
@@ -249,7 +249,7 @@ class ApiController extends AbstractController
 				}
 
 				break;
-			
+
 			case 'get':
 			default:
 
@@ -258,7 +258,7 @@ class ApiController extends AbstractController
 				} else {
 					$offset = $this->getParam('offset', 0);
 					$limit	 = $this->getParam('limit', 50);
-					
+
 					$params = $this->getQueryData();
 					unset($params['offset']);
 					unset($params['limit']);
@@ -266,9 +266,9 @@ class ApiController extends AbstractController
 					$entries = $model->fetchAll($limit, $offset, $params);
 					return json_encode($entries);
 				}
-				
+
 		}
-		
+
 		return false;
 	}
 
@@ -276,18 +276,18 @@ class ApiController extends AbstractController
 	{
 		$model = $this->getServiceManager()->get('feeds');
 		$feed  = $model->fetch($feed_id);
-		
+
 		if (!$feed) {
 			throw new \Exception(json_encode(array(
 				'error' => 'Feed not found'
 			)), 404);
 		}
-		
+
 		$domain = parse_url($feed['link'], PHP_URL_HOST);
-		
+
 		header('HTTP/1.1 301');
 		header('Location: https://plus.google.com/_/favicon?domain=' . $domain);
 		exit();
 	}
-	
+
 }

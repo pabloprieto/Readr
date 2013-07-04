@@ -14,12 +14,12 @@ use Readr\Model\Settings;
 
 class App
 {
-	
+
 	/**
 	 * @var string
 	 */
 	protected static $basePath;
-	
+
 	/**
 	 * @var ServiceManager
 	 */
@@ -31,17 +31,17 @@ class App
 	public function run()
 	{
 		$this->checkInstall();
-		
+
 		try {
-			
+
 			$response = $this->route();
 			echo $response;
-			
+
 		} catch (\Exception $e) {
-		
+
 			header($_SERVER['SERVER_PROTOCOL'] . ' ' . $e->getCode());
 			die($e->getMessage());
-			
+
 		}
 	}
 
@@ -54,10 +54,10 @@ class App
 			$path = dirname($_SERVER['SCRIPT_NAME']);
 			self::$basePath = rtrim($path, '/') . '/';
 		}
-		
+
 		return self::$basePath;
 	}
-	
+
 	/**
 	 * @return string
 	 */
@@ -65,7 +65,7 @@ class App
 	{
 		return array(0,5,1);
 	}
-	
+
 	/**
 	 * @return int
 	 */
@@ -89,7 +89,7 @@ class App
 			$args = array();
 
 		} else {
-			
+
 			$segments = explode('/', $path);
 
 			$controllerName = $segments[0];
@@ -99,7 +99,7 @@ class App
 		}
 
 		$class = '\\Readr\\Controller\\' . ucfirst($controllerName) . 'Controller';
-		
+
 		if (!class_exists($class)) {
 			throw new \Exception("Page not found", 404);
 		}
@@ -119,7 +119,7 @@ class App
 
 		} elseif (is_array($response) || is_null($response)) {
 
-			$template = 'readr/views/' . strtolower($controllerName) . '/' . strtolower($actionName) . '.phtml'; 
+			$template = 'readr/views/' . strtolower($controllerName) . '/' . strtolower($actionName) . '.phtml';
 			$view = new View($template, $response);
 
 			$layout = new View('readr/views/layout.phtml', array(
@@ -130,7 +130,7 @@ class App
 			return $layout->render();
 
 		}
-		
+
 		return false;
 	}
 
@@ -141,12 +141,12 @@ class App
 	{
 		$sm = $this->getServiceManager();
 		$db = $sm->get('db');
-		
+
 		$statement = $db->query("SELECT COUNT(*) FROM sqlite_master WHERE type='table'");
 		$count = (int) $statement->fetchColumn(0);
-		
+
 		if ($count == 0) {
-			
+
 			$db->exec(
 				'CREATE TABLE "feeds" (
 				"id" INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -156,14 +156,14 @@ class App
 				"last_update" INTEGER,
 				"last_error" TEXT)'
 			);
-			           
+
 			$db->exec(
 				'CREATE TABLE "tags" (
 				"name" TEXT NOT NULL,
 				"feed_id" INTEGER NOT NULL REFERENCES "feeds"("id") ON DELETE CASCADE,
 				PRIMARY KEY ("name", "feed_id"))'
 			);
-	
+
 			$db->exec(
 				'CREATE TABLE "entries" (
 				"id" INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -176,20 +176,20 @@ class App
 				"read" INTEGER NOT NULL DEFAULT 0,
 				"favorite" INTEGER NOT NULL DEFAULT 0)'
 			);
-			
+
 			$db->exec(
 				'CREATE TABLE "settings" (
 				"name" TEXT PRIMARY KEY,
 				"value" TEXT)'
 			);
-			
+
 			$settings = $sm->get('settings');
 			$settings->set('version', self::getVersion());
-			
+
 			return false;
-			
+
 		}
-		
+
 		return true;
 	}
 
@@ -200,36 +200,36 @@ class App
 	{
 		if (!$this->serviceManager) {
 			$this->serviceManager = new ServiceManager(array(
-				
+
 				'db' => function($sm) {
 					$db = new PDO('sqlite:data/reader.db');
 					$db->exec('PRAGMA foreign_keys=ON');
 					return $db;
 				},
-				
+
 				'settings' => function($sm) {
 					$db = $sm->get('db');
 					return new Model\Settings($db);
 				},
-				
+
 				'feeds' => function($sm) {
 					$db = $sm->get('db');
 					return new Model\Feeds($db);
 				},
-				
+
 				'entries' => function($sm) {
 					$db = $sm->get('db');
 					return new Model\Entries($db);
 				},
-				
+
 				'tags' => function($sm) {
 					$db = $sm->get('db');
 					return new Model\Tags($db);
 				}
-				
+
 			));
 		}
-		
+
 		return $this->serviceManager;
 	}
 
@@ -239,13 +239,13 @@ class App
 	protected function getPathInfo()
 	{
 		if (isset($_SERVER['PATH_INFO'])) {
-	        return ltrim($_SERVER['PATH_INFO'], '/');
-	    }
+			return ltrim($_SERVER['PATH_INFO'], '/');
+			}
 
-	    $basePath = self::getBasePath();
-	    $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+		$basePath = self::getBasePath();
+		$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-	    return (string) substr($uri, strpos($uri, $basePath) + strlen($basePath));
+		return (string) substr($uri, strpos($uri, $basePath) + strlen($basePath));
 	}
 
 }

@@ -2,8 +2,8 @@
 /**
  * Readr
  *
- * @link    http://github.com/pabloprieto/Readr
- * @author  Pablo Prieto
+ * @link	http://github.com/pabloprieto/Readr
+ * @author	Pablo Prieto
  * @license http://opensource.org/licenses/GPL-3.0
  */
 
@@ -15,7 +15,7 @@ use Readr\ServiceManager;
 
 abstract class AbstractController
 {
-	
+
 	/**
 	 * @var ServiceManager
 	 */
@@ -30,9 +30,9 @@ abstract class AbstractController
 		$this->serviceManager = $serviceManager;
 		$this->init();
 	}
-	
+
 	public function init(){}
-	
+
 	/**
 	 * @return bool
 	 */
@@ -40,20 +40,20 @@ abstract class AbstractController
 	{
 		$settings = $this->getServiceManager()->get('settings');
 		$username = $settings->get('username');
-		
+
 		if (!$username) {
 			return true;
 		}
-		
+
 		session_start();
-		
+
 		if (array_key_exists('username', $_SESSION) && $username == $_SESSION['username']) {
 			return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	/**
 	 * @return ServiceManager
 	 */
@@ -103,7 +103,7 @@ abstract class AbstractController
 	protected function getPostData()
 	{
 		return filter_var_array($_POST, FILTER_SANITIZE_STRING);
-	}	
+	}
 
 	/**
 	 * @return array

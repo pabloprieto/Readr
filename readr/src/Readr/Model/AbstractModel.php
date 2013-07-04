@@ -2,8 +2,8 @@
 /**
  * Readr
  *
- * @link    http://github.com/pabloprieto/Readr
- * @author  Pablo Prieto
+ * @link	http://github.com/pabloprieto/Readr
+ * @author	Pablo Prieto
  * @license http://opensource.org/licenses/GPL-3.0
  */
 
@@ -18,7 +18,7 @@ abstract class AbstractModel
 	 * @var PDO
 	 */
 	protected $db;
-	
+
 	/**
 	 * @param PDO $db
 	 * @return void
@@ -35,13 +35,13 @@ abstract class AbstractModel
 	{
 		return $this->getDb()->lastInsertId();
 	}
-	
+
 	/**
 	 * @return array
 	 */
 	public function errorInfo()
 	{
-    	return $this->getDb()->errorInfo();
+		return $this->getDb()->errorInfo();
 	}
 
 	/**

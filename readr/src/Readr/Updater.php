@@ -20,7 +20,7 @@ class Updater
 	 * @var Feeds
 	 */
 	protected $feedsModel;
-	
+
 	/**
 	 * @var Entries
 	 */
@@ -78,8 +78,8 @@ class Updater
 			}
 
 			$this->feedsModel->setUpdateData(
-				$feed['id'], 
-				time(), 
+				$feed['id'],
+				time(),
 				$result ? null : $simplePie->error()
 			);
 

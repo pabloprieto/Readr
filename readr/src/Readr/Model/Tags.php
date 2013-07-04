@@ -52,10 +52,10 @@ class Tags extends AbstractModel
 
 		return $statement->rowCount();
 	}
-	
+
 	public function remove($feed_id)
 	{
-    	$statement = $this->getDb()->prepare("DELETE FROM tags WHERE feed_id = :feed_id");
+		$statement = $this->getDb()->prepare("DELETE FROM tags WHERE feed_id = :feed_id");
 		$statement->execute(array(
 			':feed_id' => $feed_id
 		));

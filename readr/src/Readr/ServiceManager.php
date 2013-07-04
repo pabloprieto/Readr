@@ -13,17 +13,17 @@ use RuntimeException;
 
 class ServiceManager
 {
-	
+
 	/**
 	 * @var array
 	 */
 	protected $factories;
-	
+
 	/**
 	 * @var array
 	 */
 	protected $instances;
-	
+
 	/**
 	 * @param array $factories (default: array())
 	 * @return void
@@ -33,7 +33,7 @@ class ServiceManager
 		$this->factories = $factories;
 		$this->instances = array();
 	}
-	
+
 	/**
 	 * @param string $name
 	 * @param callable $factory
@@ -43,7 +43,7 @@ class ServiceManager
 	{
 		$this->factories[$name] = $factory;
 	}
-	
+
 	/**
 	 * @param string $name
 	 * @return mixed
@@ -53,10 +53,10 @@ class ServiceManager
 		if (!array_key_exists($name, $this->instances)) {
 			$this->create($name);
 		}
-		
+
 		return $this->instances[$name];
 	}
-	
+
 	/**
 	 * @param string $name
 	 * @return bool
@@ -65,7 +65,7 @@ class ServiceManager
 	{
 		return array_key_exists($name, $this->factories);
 	}
-	
+
 	/**
 	 * @param string $name
 	 * @return void
@@ -75,20 +75,20 @@ class ServiceManager
 	{
 		if (!$this->has($name)) {
 			throw new RuntimeException(sprintf(
-				"%s: Invalid service name '%s'.", 
-				get_class($this), 
+				"%s: Invalid service name '%s'.",
+				get_class($this),
 				$name
 			));
 		}
-		
+
 		if (!is_callable($this->factories[$name])) {
 			throw new RuntimeException(sprintf(
-				"%s: Can't create service '%s', factory is not callable.", 
-				get_class($this), 
+				"%s: Can't create service '%s', factory is not callable.",
+				get_class($this),
 				$name
 			));
 		}
-		
+
 		$this->instances[$name] = $this->factories[$name]($this);
 	}
 

@@ -2,8 +2,8 @@
 /**
  * Readr
  *
- * @link    http://github.com/pabloprieto/Readr
- * @author  Pablo Prieto
+ * @link	http://github.com/pabloprieto/Readr
+ * @author	Pablo Prieto
  * @license http://opensource.org/licenses/GPL-3.0
  */
 
@@ -22,7 +22,7 @@ class IndexController extends AbstractController
 	public function indexAction()
 	{
 		$settings = $this->getServiceManager()->get('settings');
-		
+
 		return array(
 			'username' => $settings->get('username')
 		);

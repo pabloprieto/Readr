@@ -2,8 +2,8 @@
 /**
  * Readr
  *
- * @link    http://github.com/pabloprieto/Readr
- * @author  Pablo Prieto
+ * @link	http://github.com/pabloprieto/Readr
+ * @author	Pablo Prieto
  * @license http://opensource.org/licenses/GPL-3.0
  */
 
@@ -22,7 +22,7 @@ class Entries extends AbstractModel
 
 		$statement = $this->getDb()->prepare($sql);
 		$statement->execute(array(
-			':id'  => $id
+			':id' => $id
 		));
 
 		return $statement->fetch(PDO::FETCH_ASSOC);
@@ -33,10 +33,10 @@ class Entries extends AbstractModel
 		$columns = array(
 			'entries.id',
 			'entries.feed_id',
-			'entries.title', 
+			'entries.title',
 			'entries.date',
-			'entries.read', 
-			'entries.favorite', 
+			'entries.read',
+			'entries.favorite',
 			'feeds.title AS feed_title',
 			'GROUP_CONCAT(tags.name,\',\') AS tags'
 		);
@@ -59,7 +59,7 @@ class Entries extends AbstractModel
 		$sql  = "SELECT " . implode(', ', $columns) . " FROM entries";
 		$sql .= " JOIN feeds ON feeds.id = entries.feed_id";
 		$sql .= " LEFT JOIN tags ON feeds.id = tags.feed_id";
-		
+
 		if (count($where)) {
 			$sql .= " WHERE " . implode(' AND ', $where);
 		}
@@ -68,7 +68,7 @@ class Entries extends AbstractModel
 
 		$statement = $this->getDb()->prepare($sql);
 		$statement->execute(array(
-			':limit'  => $limit,
+			':limit'	 => $limit,
 			':offset' => $offset
 		));
 
@@ -77,17 +77,17 @@ class Entries extends AbstractModel
 
 	public function insert($feed_id, $title, $content, $author, $link, $date)
 	{
-		$sql = "INSERT INTO entries (feed_id, title, content, author, link, date) 
+		$sql = "INSERT INTO entries (feed_id, title, content, author, link, date)
 		        VALUES (:feed_id, :title, :content, :author, :link, :date)";
 
 		$statement = $this->getDb()->prepare($sql);
 		$statement->execute(array(
 			':feed_id' => $feed_id,
-			':title'   => $title,
+			':title'	  => $title,
 			':content' => $content,
 			':author'  => $author,
-			':link'    => $link,
-			':date'    => $date
+			':link'	  => $link,
+			':date'	  => $date
 		));
 
 		return $statement->rowCount();
@@ -107,7 +107,7 @@ class Entries extends AbstractModel
 		} elseif ($tag_name) {
 			$sql .= " WHERE feed_id IN (SELECT feed_id FROM tags WHERE name = :tag_name)";
 			$params[':tag_name'] = $tag_name;
-		} 
+		}
 
 		$statement = $this->getDb()->prepare($sql);
 		$statement->execute($params);

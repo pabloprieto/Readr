@@ -11,12 +11,12 @@ namespace Readr;
 
 class View
 {
-	
+
 	/**
 	 * @var string
 	 */
 	protected $path;
-	
+
 	/**
 	 * @var array
 	 */
@@ -56,7 +56,7 @@ class View
 				$this->path
 			));
 		}
-		
+
 		ob_start();
 		include $this->path;
 		return ob_get_clean();

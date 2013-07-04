@@ -2,8 +2,8 @@
 /**
  * Readr
  *
- * @link    http://github.com/pabloprieto/Readr
- * @author  Pablo Prieto
+ * @link	http://github.com/pabloprieto/Readr
+ * @author	Pablo Prieto
  * @license http://opensource.org/licenses/GPL-3.0
  */
 
@@ -16,34 +16,34 @@ class LoginController extends AbstractController
 	{
 		$data   = $this->getPostData();
 		$errors = array();
-		
+
 		if (!empty($data)) {
-			
+
 			$auth = $this->checkCredentials(
 				$data['username'],
 				$data['password']
 			);
-			
+
 			if ($auth) {
 				return $this->redirect();
 			} else {
 				$errors[] = 'Wrong username or password.';
 			}
-			
+
 		}
-		
+
 		return array(
 			'errors' => $errors
 		);
 	}
-	
+
 	public function signoutAction()
 	{
 		session_start();
 		unset($_SESSION['username']);
 		$this->redirect();
 	}
-	
+
 	/**
 	 * @param string $username
 	 * @param string $password
@@ -52,16 +52,16 @@ class LoginController extends AbstractController
 	protected function checkCredentials($username, $password)
 	{
 		$settings = $this->getServiceManager()->get('settings');
-		
+
 		if (
-			$username == $settings->get('username') && 
+			$username == $settings->get('username') &&
 			password_verify($password, $settings->get('password'))
 		) {
 			session_start();
 			$_SESSION['username'] = $username;
 			return true;
 		}
-		
+
 		return false;
 	}
 
