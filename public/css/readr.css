@@ -24,11 +24,16 @@ h1, h2, h3, h4, h5, h6, p, ul, input, select, textarea, button {
 
 input[type=text], input[type=password], input[type=email], input[type=url], textarea {
 	border: 2px solid #bdc3c7;
+	border-radius: 0;
 	padding: 6px;
 	line-height: 1em;
 	vertical-align: middle;
 	box-shadow: inset 0 2px 2px rgba(0, 0, 0, 0.1);
-	width: 200px;
+	width: 100%;
+	max-width: 200px;
+	-webkit-box-sizing: border-box;
+	   -moz-box-sizing: border-box;
+	        box-sizing: border-box;
 }
 
 input[type=text]:focus, input[type=password]:focus, input[type=email]:focus, input[type=url]:focus, textarea:focus {
@@ -114,6 +119,22 @@ button {
 	background-position: -70px 0;
 }
 
+.icon-home {
+	background-position: -84px 0;
+}
+
+.icon-menu {
+	background-position: 0 -14px;
+}
+
+.icon-back {
+	background-position: -14px -14px;
+}
+
+.icon-settings {
+	background-position: -28px -14px;
+}
+
 .icon-favicon {
 	width: 16px;
 	height: 16px;
@@ -161,11 +182,6 @@ button {
 .nav li {
 	float: left;
 	line-height: 20px;
-	margin: 0 5px;
-}
-
-.nav .active {
-	border-bottom: 3px solid #3498DB;
 }
 
 .form-item {
@@ -196,18 +212,35 @@ button {
 .app-navbar {
 	position: relative;
 	line-height: 20px;
+	min-height: 40px;
+	padding: 0 10px;
 	background: #111;
 	color: #eee;
-	text-shadow: 0px 0px 1px black;
 	z-index: 666;
-	overflow: hidden;
 }
 
-.app-navbar h1,
-.app-navbar .nav {
+.app-navbar [class^="icon-"] {
+	margin-top: 2px;
+}
+
+.app-navbar .item {
 	float: left;
-	margin: 0 20px;
 	line-height: 40px;
+}
+
+.app-navbar .group {
+	float: left;
+	margin-right: 40px;
+	background: #111;
+}
+
+.app-navbar .group:last-child {
+	margin-right: 0;
+}
+
+.app-navbar .menu,
+.app-navbar .menu-collapse {
+	display: none;
 }
 
 .app-navbar .nav li {
@@ -215,34 +248,49 @@ button {
 	height: 40px;
 }
 
-.app-navbar .nav button,
-.app-navbar .nav a {
-	display: inline-block;
+.app-navbar button,
+.app-navbar a {
+	display: block;
 	line-height: 40px;
 	height: 40px;
+	padding: 0 10px;
 	vertical-align: top;
+	white-space: nowrap;
+	text-decoration: none;
+}
+
+.app-navbar button:focus,
+.app-navbar button:hover,
+.app-navbar a:focus,
+.app-navbar a:hover {
+	background: #333;
+}
+
+.app-navbar .active {
+	background: #3498DB !important;
+}
+
+.app-navbar .pull-right {
+	float: right;
+}
+
+.app-navbar .feed-title {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	width: 150px;
 }
 
 .app-body {
+}
+
+.app-body .col {
 	position: fixed;
 	top: 40px;
 	bottom: 0;
 	overflow: auto;
-	width: 100%;
 	-webkit-box-sizing: border-box;
-		-moz-box-sizing: border-box;
-			 box-sizing: border-box;
-}
-
-.app-body .col {
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	height: 100%;
-	overflow: auto;
-	-webkit-box-sizing: border-box;
-		-moz-box-sizing: border-box;
-			 box-sizing: border-box;
+	   -moz-box-sizing: border-box;
+	        box-sizing: border-box;
 }
 
 .app-body  > .feeds {
@@ -274,12 +322,11 @@ button {
 .feeds .item {
 	position: relative;
 	line-height: 20px;
-	padding: 0 24px 0 5px;
-	margin: 8px 0;
+	padding: 5px 24px 5px 5px;
 }
 
 .feeds .tag-item {
-	margin: 16px 0;
+
 }
 
 .feeds .active {
@@ -287,7 +334,7 @@ button {
 }
 
 .feeds ul ul .item {
-	padding-left: 24px;
+	padding-left: 32px;
 }
 
 .feeds .item button {
@@ -297,7 +344,7 @@ button {
 
 .feeds .item .actions {
 	position: absolute;
-	top: 0;
+	top: 5px;
 	right: 8px;
 	display: none;
 	z-index: 1;
@@ -320,18 +367,18 @@ button {
 
 .feeds .item .icon-arrow {
 	-webkit-transform: rotate(90deg);
-		-moz-transform: rotate(90deg);
-		 -ms-transform: rotate(90deg);
-		  -o-transform: rotate(90deg);
-			 transform: rotate(90deg);
+	   -moz-transform: rotate(90deg);
+	    -ms-transform: rotate(90deg);
+	     -o-transform: rotate(90deg);
+	        transform: rotate(90deg);
 }
 
 .feeds .collapse .item .icon-arrow {
 	-webkit-transform: rotate(0);
-		-moz-transform: rotate(0);
-		 -ms-transform: rotate(0);
-		  -o-transform: rotate(0);
-			 transform: rotate(0);
+	   -moz-transform: rotate(0);
+	    -ms-transform: rotate(0);
+	     -o-transform: rotate(0);
+	        transform: rotate(0);
 }
 
 .feeds .item .icon-favicon {
@@ -400,7 +447,7 @@ button {
 .entry .title {
 	font-size: 24px;
 	font-weight: bold;
-	line-height: 1;
+	line-height: 1.2;
 	margin: 0 0 10px;
 }
 
@@ -438,9 +485,6 @@ button {
 	z-index: 666;
 	background: rgba(0,0,0,0.8);
 	display: none;
-	opacity: 0;
-	-webkit-transition-property: opacity;
-	-webkit-transition-duration: 1s;
 }
 
 .modal.display {
@@ -505,4 +549,145 @@ button {
 	padding: 20px;
 	width: 400px;
 	margin: 0 auto;
+}
+
+@media screen and (max-width: 900px) {
+
+	.app-navbar .menu-collapse {
+		display: block;
+	}
+
+	.app-navbar .item-collapse {
+		display: none;
+		float: none;
+		position: absolute;
+		top: 40px;
+		right: 0;
+		z-index: 666;
+		background: #111;
+		color: #eee;
+	}
+	
+	.app-navbar .item-collapse.in {
+		display: block;
+	}
+	
+	.app-navbar .item-collapse .group {
+		float: none;
+		padding-bottom: 5px;
+		border-bottom: 1px solid #333;
+		margin: 0 0 5px;
+	}
+	
+	.app-navbar .item-collapse .group:last-child {
+		margin: 0;
+		border: none;
+	}
+	
+	.app-navbar .item-collapse li {
+		float: none;
+	}
+	
+	.app-navbar .item-collapse button,
+	.app-navbar .item-collapse a {
+		display: block;
+		width: 100%;
+	}
+	
+	.app-navbar .item-collapse .nav .active {
+		border: none;
+		background: #3498DB;
+	}
+
+}
+
+@media screen and (max-width: 640px) {
+
+	input[type=text], input[type=password], input[type=email], input[type=url], textarea {
+		max-width: none;
+	}
+	
+	.app-navbar {
+		padding: 0 10px;
+	}
+	
+	.app-navbar .group {
+		margin-right: 0;
+	}
+	
+	.app-navbar .menu {
+		display: block;
+	}
+
+	.app-body .col {
+		width: 100%;
+		right: 0;
+		-webkit-transition-property: left;
+		-webkit-transition-duration: 200ms;
+		-webkit-transition-delay: 100ms;
+		-moz-transition-property: left;
+		-moz-transition-duration: 200ms;
+		-moz-transition-delay: 100ms;
+	}
+	
+	.app-body .feeds {
+		left: -100%;
+		width: 90%;
+	}
+	
+	.app-body .entries {
+		left: 0;
+		border: none;
+	}
+	
+	.app-body .entry {
+		left: 100%;
+	}
+	
+	.app-body[data-mode=feeds] .feeds {
+		left: 0;
+	}
+	
+	.app-body[data-mode=feeds] .entries {
+		left: 90%;
+	}
+	
+	.app-body[data-mode=feeds] .entry {
+		left: 100%;
+	}
+	
+	.app-body[data-mode=entry] .entries {
+		left: -100%;
+	}
+	
+	.app-body[data-mode=entry] .entry {
+		left: 0;
+	}
+	
+	.form-item .form-label {
+		float: none;
+		width: auto;
+		margin: 0;
+	}
+	
+	.form-item .controls {
+		margin: 0;
+	}
+	
+	.form-login {
+		width: auto;
+	}
+	
+	.modal-content {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		width: auto;
+		min-height: 100%;
+		margin: 0;
+		background: #fff;
+		overflow: scroll;
+	}
+
 }

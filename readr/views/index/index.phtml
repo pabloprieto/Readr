@@ -1,28 +1,48 @@
 <div class="app" id="readrApp">
 
 	<header class="app-header app-navbar">
-
-		<h1>
-			<a href="<?= $this->basePath() ?>">Readr</a>
-		</h1>
-
-		<ul class="nav">
-			<li><button name="read" value="all" data-toggle="filter-status" class="active">All</button></li>
-			<li><button name="read" value="0" data-toggle="filter-status">Unread</button></li>
-			<li><button name="favorite" value="1" data-toggle="filter-status">Favorites</button></li>
-			<li><button data-toggle="mark-read">Mark as read</button></li>
-		</ul>
-
-		<ul class="nav">
-			<li><button data-toggle="add-feed">Add subscription...</button></li>
-		</ul>
-
-		<ul class="nav">
-			<li><a href="<?= $this->basePath('settings') ?>">Settings</a></li>
-			<?php if($this->username): ?>
-			<li><a href="<?= $this->basePath('login/signout') ?>">Signout</a></li>
-			<?php endif; ?>
-		</ul>
+	
+		<div class="group">
+			<button class="item menu" data-toggle="mode" value="feeds">
+				<i class="icon-menu"></i>
+			</button>
+			<h1 class="item">
+				<a href="<?= $this->basePath() ?>">Readr</a>
+			</h1>
+			<h2 class="item">
+				<button class="feed-title" data-toggle="mode" value="entries">All items</button>
+			</h2>
+		</div>
+		
+		<div class="group pull-right">
+			
+			<button class="item menu-collapse" data-toggle="collapse" data-target="#options">
+				<i class="icon-settings"></i>
+			</button>
+			
+			<div class="item item-collapse" id="options">
+	
+				<ul class="group nav">
+					<li><button name="read" value="all" data-toggle="filter-status" class="active">All</button></li>
+					<li><button name="read" value="0" data-toggle="filter-status">Unread</button></li>
+					<li><button name="favorite" value="1" data-toggle="filter-status">Favorites</button></li>
+					<li><button data-toggle="mark-read">Mark as read</button></li>
+				</ul>
+		
+				<ul class="group nav">
+					<li><button data-toggle="add-feed">Add subscription…</button></li>
+				</ul>
+				
+				<ul class="group nav">
+					<li><a href="<?= $this->basePath('settings') ?>">Settings</a></li>
+					<?php if($this->username): ?>
+					<li><a href="<?= $this->basePath('login/signout') ?>">Sign out</a></li>
+					<?php endif; ?>
+				</ul>
+			
+			</div>
+		
+		</div>
 
 	</header>
 
@@ -30,8 +50,11 @@
 
 		<aside class="col feeds">
 			<ul>
-				<li class="item active">
-					<button name="feed_id" value="all" data-toggle="filter-source">All items</button>
+				<li class="item">
+					<button name="feed_id" value="all" data-toggle="filter-source">
+						<i class="icon-home"></i>
+						All items
+					</button>
 				</li>
 			</ul>
 			<ul class="feeds-list"></ul>
@@ -70,6 +93,7 @@
 				<label class="form-label">Tags</label>
 				<div class="controls">
 					<input type="text" name="tags"/>
+					<span class="help-block">Separated by commas</span>
 				</div>
 			</div>
 			<div class="error alert-block"></div>
@@ -126,6 +150,7 @@
 				<label class="form-label">Tags</label>
 				<div class="controls">
 					<input type="text" name="tags" value="<%- tags %>"/>
+					<span class="help-block">Separated by commas</span>
 				</div>
 			</div>
 			<% if(last_error){ %>
