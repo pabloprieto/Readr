@@ -609,7 +609,7 @@ this.readr = this.readr||{};
 				model: entry
 			}).render();
 			
-			view.$el.toggleClass('active', this.currentEntry && this.currentEntry.id == entry.id);
+			view.$el.toggleClass('active', this.currentEntry != null && this.currentEntry.id == entry.id);
 
 			this.listenTo(view, 'select', this.onSelectEntry);
 			this.$('.entries-list').append(view.el);
