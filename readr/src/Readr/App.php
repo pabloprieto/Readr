@@ -31,6 +31,7 @@ class App
 	public function run()
 	{
 		$this->checkInstall();
+		$this->checkVersion();
 
 		try {
 
@@ -191,6 +192,20 @@ class App
 		}
 
 		return true;
+	}
+
+	/**
+	 * @return void
+	 */
+	protected function checkVersion()
+	{
+		$settings = $this->getServiceManager()->get('settings');
+		$version  = intval($settings->get('version'));
+		
+		if ($version < self::getVersion()) {
+			// TODO: run migrations if necessary
+			$settings->set('version', self::getVersion());
+		}
 	}
 
 	/**
