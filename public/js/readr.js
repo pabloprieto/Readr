@@ -565,11 +565,11 @@ this.readr = this.readr||{};
 			var entry = this.entries.get(id);
 		
 			if (!entry) {
-				this.fetchEntries();
-				this.listenToOnce(this.entries, 'sync', function(){
-					view.fetchEntry(id);
+				// Direct access, create a new entry and fetch the collection
+				entry = new Entry({id:id}, {
+					urlRoot: this.entries.url
 				});
-				return;
+				this.entries.fetch();
 			}
 			
 			if (entry.get('content') == undefined) {
@@ -608,6 +608,8 @@ this.readr = this.readr||{};
 			var view = new EntryItemView({
 				model: entry
 			}).render();
+			
+			view.$el.toggleClass('active', this.currentEntry && this.currentEntry.id == entry.id);
 
 			this.listenTo(view, 'select', this.onSelectEntry);
 			this.$('.entries-list').append(view.el);
