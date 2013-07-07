@@ -842,19 +842,34 @@ this.readr = this.readr||{};
 		
 		onKeyPress: function(event)
 		{
-			if (!this.currentEntry) return;
+			if (!this.currentEntry || event.metaKey) return;
+			
+			var code = event.which || event.keyCode;
 		
-			switch (event.keyCode) {
+			event.preventDefault();
+		
+			switch (code) {
 				case 32: // space
-					event.preventDefault();
 					var index = this.entries.indexOf(this.currentEntry);
 					var entry = this.entries.at(index + (event.shiftKey ? -1 : 1));
 					if (entry) this.router.navigate('entry/' + entry.id, {trigger: true});
 					break;
 					
-				case 114: // r
+				case 109: // m/r: toggle read
+				case 114: 
+					var read = parseInt(this.currentEntry.get('read'));
+					this.currentEntry.save({read: read == 0 ? 1 : 0}, {patch: true});
+					break;
+					
+				case 102: // f/s: toggle favorite
+				case 115:
+					var favorite = parseInt(this.currentEntry.get('favorite'));
+					this.currentEntry.save({favorite: favorite == 0 ? 1 : 0}, {patch: true});
+					break; 
 				
-				case 102: // f
+				case 118: // v: view
+					window.open(this.currentEntry.get('link'));
+					break;
 			}
 		},
 		
