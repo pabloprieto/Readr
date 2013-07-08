@@ -25,11 +25,13 @@ Licensed under the GPLv3 license.
 
 * `space` : next entry
 * `shift` + `space` : previous entry
-* More to come…
+* `r` or `m` : mark as read/unread
+* `f` or `s` : toggle favorite
+* `v` : open the original source in a new window
 
 ## Todo
 
-* Responsive design
+* ~~Responsive design~~
 * Self updating process
 * [Fever](http://www.feedafever.com/api) compatible api
 
@@ -42,6 +44,7 @@ Readr makes use of the following libraries:
 * jQuery: http://jquery.com
 * Backbone.js: http://backbonejs.org
 * Moment.js: http://momentjs.com
+* Hammer.js: http://eightmedia.github.io/hammer.js/
 
 ## Contact
 
@@ -49,6 +52,10 @@ Pablo Prieto, [pabloprieto.net](http://pabloprieto.net/)
 
 ## Changelog
 
+* **v0.6**
+	- Responsive design
+	- Direct urls to feeds, tags and entries
+	- Added keyboards shortcuts
 * **v0.5.1**
 	- Security fix
 * **v0.5**

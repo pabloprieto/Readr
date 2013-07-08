@@ -2,12 +2,16 @@ this.readr = this.readr||{};
 
 (function(){
 
-	var Feeds = Backbone.Collection.extend({
+	var Entry = Backbone.Model.extend({});
+	
+	var Feed = Backbone.Model.extend({});
 
+	var Feeds = Backbone.Collection.extend({
+		model: Feed
 	});
 
 	var Entries = Backbone.Collection.extend({
-
+		model: Entry
 	});
 	
 	var ModalView = Backbone.View.extend({
@@ -79,7 +83,6 @@ this.readr = this.readr||{};
 				},
 				success: function(data) {
 					view.trigger('added', this);
-					console.info(data);
 					view.close();
 				},
 				error: function(data) {
@@ -345,7 +348,50 @@ this.readr = this.readr||{};
 
 	});
 
+	var ReadrRouter = Backbone.Router.extend({
+	
+		app: null,
+	
+		routes: {
+			'tag/:name' : 'tag',
+			'feed/:id'  : 'feed',
+			'entry/:id' : 'entry',
+			''          : 'default'
+		},
+		
+		initialize: function(options)
+		{
+			this.app = options.app;
+		},
+		
+		default: function()
+		{
+			this.app.setSourceFilter('feed_id', 'all');
+			this.app.fetchEntries();
+		},
+		
+		tag: function(name)
+		{
+			this.app.setSourceFilter('tag', name);
+			this.app.fetchEntries();
+		},
+		
+		feed: function(id)
+		{
+			this.app.setSourceFilter('feed_id', id);
+			this.app.fetchEntries();
+		},
+		
+		entry: function(id)
+		{
+			this.app.fetchEntry(id);
+		}
+	
+	});
+
 	var ReadrApp = Backbone.View.extend({
+
+		router: null,
 
 		feeds: null,
 		entries: null,
@@ -366,21 +412,35 @@ this.readr = this.readr||{};
 		},
 
 		events: {
-			'click [data-toggle=filter-status]': 'onFilterStatus',
-			'click [data-toggle=filter-source]': 'onFilterSource',
-			'click [data-toggle=mark-read]': 'onMarkAsRead',
-			'click [data-toggle=add-feed]': 'onAddFeed'
+			'click [data-toggle=mode]'          : 'onToggleMode',
+			'click [data-toggle=filter-status]' : 'onFilterStatus',
+			'click [data-toggle=filter-source]' : 'onFilterSource',
+			'click [data-toggle=mark-read]'     : 'onMarkAsRead',
+			'click [data-toggle=add-feed]'      : 'onAddFeed',
+			'click [data-toggle=collapse]'      : 'onToggleCollapse'
 		},
 
 		initialize: function()
 		{
 			this.initFeeds();
 			this.initEntries();
+			this.initEvents();
 			this.fetchFeeds();
-			this.fetchEntries();
 			
+			this.listenToOnce(this.feeds, 'sync', this.initRouter);
+		},
+		
+		initEvents: function()
+		{
 			this.$('.entries').on('scroll', $.proxy(this.onScrollEntries, this));
+			this.$('.entry').hammer().on('swipeleft swiperight', $.proxy(this.onSwipeEntry, this));
 			$(document).on('keypress', $.proxy(this.onKeyPress, this));
+		},
+		
+		initRouter: function()
+		{
+			this.router = new ReadrRouter({app: this});
+			Backbone.history.start();
 		},
 
 		initFeeds: function()
@@ -411,6 +471,11 @@ this.readr = this.readr||{};
 
 		fetchEntries: function(reset)
 		{
+			this.setMode('entries');
+			this.updateTitle();
+			this.updateActiveSourceItem();
+			this.toggleCollapse('#options', false);
+		
 			if (reset === undefined) reset = true;
 			
 			if (reset) {
@@ -426,6 +491,19 @@ this.readr = this.readr||{};
 			this.isLoading = true;
 			this.entries.fetch({reset: reset, remove: reset, data: this.params});
 			this.params.offset += this.params.limit;
+		},
+		
+		updateTitle: function()
+		{
+			var title = 'All items';
+		
+			if (this.params.tag) {
+				title = this.params.tag;
+			} else if (this.feeds.length && this.params.feed_id && this.params.feed_id != 'all') {
+				title = this.feeds.get(this.params.feed_id).get('title');
+			}
+			
+			this.$('.app-header .feed-title').text(title);
 		},
 
 		setStatusFilter: function(name, value)
@@ -450,7 +528,20 @@ this.readr = this.readr||{};
 			delete this.params.feed_id;
 			delete this.params.tag;
 			if(value != 'all') this.params[name] = value;
-
+		},
+		
+		updateActiveSourceItem: function()
+		{
+			var name  = 'feed_id';
+			var value = 'all';
+			
+			if (this.params.tag) {
+				name = 'tag';
+				value = this.params.tag;
+			} else if (this.params.feed_id) {
+				value = this.params.feed_id;
+			}
+		
 			this.$('[data-toggle=filter-source]').each(function(i, e) {
 				var $e = $(e);
 				$e.parent().removeClass('active');
@@ -463,8 +554,24 @@ this.readr = this.readr||{};
 			});
 		},
 		
-		loadEntry: function(entry)
+		toggleCollapse: function(selector, switcher)
 		{
+			this.$(selector).toggleClass('in', switcher);
+		},
+		
+		fetchEntry: function(id)
+		{
+			var view  = this;
+			var entry = this.entries.get(id);
+		
+			if (!entry) {
+				// Direct access, create a new entry and fetch the collection
+				entry = new Entry({id:id}, {
+					urlRoot: this.entries.url
+				});
+				this.entries.fetch();
+			}
+			
 			if (entry.get('content') == undefined) {
 				entry.once('change', this.displayEntry, this);
 				entry.fetch();
@@ -475,6 +582,8 @@ this.readr = this.readr||{};
 
 		displayEntry: function(entry)
 		{
+			this.setMode('entry');
+		
 			this.$('.entries-list > .active').removeClass('active');
 			this.$('.entries-list > [data-id=' + entry.id + ']').addClass('active');
 
@@ -499,6 +608,8 @@ this.readr = this.readr||{};
 			var view = new EntryItemView({
 				model: entry
 			}).render();
+			
+			view.$el.toggleClass('active', this.currentEntry != null && this.currentEntry.id == entry.id);
 
 			this.listenTo(view, 'select', this.onSelectEntry);
 			this.$('.entries-list').append(view.el);
@@ -512,7 +623,7 @@ this.readr = this.readr||{};
 			var unclassified = new Array;
 			
 			this.feeds.each(function(feed) {
-				if (feed.get('tags') == null) {
+				if (!feed.get('tags')) {
 					unclassified.push(feed);
 					return;
 				}
@@ -529,8 +640,7 @@ this.readr = this.readr||{};
 				var view = new TagItemView({name: tag}).render();
 				this.listenTo(view, 'edit', this.onEditTag);
 				
-				$item = $('<li/>');
-				
+				var $item = $('<li/>');
 				$item.append(view.el);
 
 				$feedsContainer = $('<ul></ul>');
@@ -540,9 +650,15 @@ this.readr = this.readr||{};
 					}
 					var t = feed.get('tags').split(',');
 					if (_.indexOf(t, tag) > -1) {
+						
 						var view = new FeedItemView({model: feed}).render();
 						app.listenTo(view, 'edit', app.onEditFeed);
-						$feedsContainer.append(view.el);
+						
+						var $item = $('<li/>');
+						$item.append(view.el);
+						
+						$feedsContainer.append($item);
+						
 					}
 				});
 
@@ -557,11 +673,20 @@ this.readr = this.readr||{};
 				$item.append(view.el);
 				$container.append($item);
 			}
+			
+			this.updateActiveSourceItem();
+		},
+		
+		setMode: function(mode)
+		{
+			if (!mode) mode = 'entries';
+			this.$('.app-body').attr('data-mode', mode);
 		},
 
 		onSyncFeeds: function(model, resp, options)
 		{
 			this.buildFeedsMenu();
+			this.updateTitle();
 			this.listenTo(this.feeds, 'change:tags', this.buildFeedsMenu);
 			this.listenTo(this.feeds, 'remove', this.buildFeedsMenu);
 		},
@@ -569,6 +694,8 @@ this.readr = this.readr||{};
 		onMarkAsRead: function(event)
 		{
 			event.preventDefault();
+			
+			this.toggleCollapse('#options', false);
 
 			var app = this;
 			var data = _.clone(this.params);
@@ -614,6 +741,7 @@ this.readr = this.readr||{};
 			}
 			
 			this.addModal.show();
+			this.toggleCollapse('#options', false);
 		},
 		
 		onEditFeed: function(feed)
@@ -653,9 +781,6 @@ this.readr = this.readr||{};
 			this.entries.each(function(entry){
 				app.addEntryItem(entry);
 			});
-
-			var entry = this.entries.at(0);
-			if (entry) this.loadEntry(entry);
 		},
 
 		onAddEntry: function(model, collection, options)
@@ -667,8 +792,8 @@ this.readr = this.readr||{};
 		{
 			event.preventDefault();
 
-			var $btn	 = $(event.currentTarget);
-			var name	 = $btn.attr('name');
+			var $btn  = $(event.currentTarget);
+			var name  = $btn.attr('name');
 			var value = $btn.attr('value');
 
 			this.setStatusFilter(name, value);
@@ -679,17 +804,27 @@ this.readr = this.readr||{};
 		{
 			event.preventDefault();
 
-			var $btn	 = $(event.currentTarget);
-			var name	 = $btn.attr('name');
+			var $btn  = $(event.currentTarget);
+			var name  = $btn.attr('name');
 			var value = $btn.attr('value');
-
-			this.setSourceFilter(name, value);
-			this.fetchEntries();
+			
+			switch (name) {
+				case 'tag':
+					this.router.navigate('tag/' + value, {trigger: true});
+					break;
+				case 'feed_id':
+					this.router.navigate('feed/' + value, {trigger: true});
+					break;
+			}
 		},
 
 		onSelectEntry: function(item)
 		{
-			this.loadEntry(item.model);
+			if (item.$el.hasClass('active')) {
+				this.setMode('entry');
+			} else {
+				this.router.navigate('entry/' + item.model.id, {trigger: true});
+			}
 		},
 		
 		onChangeRead: function(entry, value, options)
@@ -709,20 +844,61 @@ this.readr = this.readr||{};
 		
 		onKeyPress: function(event)
 		{
-			if (!this.currentEntry) return;
+			// Ignore if:
+			// - No entry selected
+			// - The command key is pressed
+			// - Focus is on an input field
+			if (!this.currentEntry || event.metaKey || $(event.target).is(':input')) return;
+			
+			var code = event.which || event.keyCode;
 		
-			switch (event.keyCode) {
+			event.preventDefault();
+		
+			switch (code) {
 				case 32: // space
-					event.preventDefault();
 					var index = this.entries.indexOf(this.currentEntry);
 					var entry = this.entries.at(index + (event.shiftKey ? -1 : 1));
-					if (entry) this.loadEntry(entry);
+					if (entry) this.router.navigate('entry/' + entry.id, {trigger: true});
 					break;
 					
-				case 114: // r
+				case 109: // m/r: toggle read
+				case 114: 
+					var read = parseInt(this.currentEntry.get('read'));
+					this.currentEntry.save({read: read == 0 ? 1 : 0}, {patch: true});
+					break;
+					
+				case 102: // f/s: toggle favorite
+				case 115:
+					var favorite = parseInt(this.currentEntry.get('favorite'));
+					this.currentEntry.save({favorite: favorite == 0 ? 1 : 0}, {patch: true});
+					break; 
 				
-				case 102: // f
+				case 118: // v: view
+					window.open(this.currentEntry.get('link'));
+					break;
 			}
+		},
+		
+		onSwipeEntry: function(event)
+		{
+			var direction = event.gesture.direction == 'left' ? 1 : -1;
+			
+			var index = this.entries.indexOf(this.currentEntry);
+			var entry = this.entries.at(index + direction);
+			if (entry) this.router.navigate('entry/' + entry.id, {trigger: true});
+		},
+		
+		onToggleMode: function(event)
+		{
+			var mode  = this.$('.app-body').attr('data-mode');
+			var value = $(event.currentTarget).attr('value');
+			this.setMode(mode != value ? value : false);
+		},
+		
+		onToggleCollapse: function(event)
+		{
+			var selector = $(event.currentTarget).attr('data-target');
+			this.toggleCollapse(selector);
 		}
 
 	});

@@ -1,4 +1,11 @@
 <?php
+/**
+ * Readr
+ *
+ * @link    http://github.com/pabloprieto/Readr
+ * @author  Pablo Prieto
+ * @license http://opensource.org/licenses/GPL-3.0
+ */
 
 namespace Readr\Model;
 
@@ -45,10 +52,10 @@ class Tags extends AbstractModel
 
 		return $statement->rowCount();
 	}
-	
+
 	public function remove($feed_id)
 	{
-    	$statement = $this->getDb()->prepare("DELETE FROM tags WHERE feed_id = :feed_id");
+		$statement = $this->getDb()->prepare("DELETE FROM tags WHERE feed_id = :feed_id");
 		$statement->execute(array(
 			':feed_id' => $feed_id
 		));

@@ -1,4 +1,11 @@
 <?php
+/**
+ * Readr
+ *
+ * @link	http://github.com/pabloprieto/Readr
+ * @author	Pablo Prieto
+ * @license http://opensource.org/licenses/GPL-3.0
+ */
 
 namespace Readr\Controller;
 
@@ -8,78 +15,58 @@ use Readr\ServiceManager;
 
 abstract class AbstractController
 {
-	
-	protected $serviceManager;
-	protected $feedsModel;
-	protected $tagsModel;
-	protected $entriesModel;
 
+	/**
+	 * @var ServiceManager
+	 */
+	protected $serviceManager;
+
+	/**
+	 * @param ServiceManager $serviceManager
+	 * @return void
+	 */
 	public function __construct(ServiceManager $serviceManager)
 	{
 		$this->serviceManager = $serviceManager;
 		$this->init();
 	}
-	
-	public function init()
-	{}
-	
-	protected function checkAuth($message = null)
+
+	public function init(){}
+
+	/**
+	 * @return bool
+	 */
+	protected function checkAuth()
 	{
 		$settings = $this->getServiceManager()->get('settings');
 		$username = $settings->get('username');
-		
+
 		if (!$username) {
 			return true;
 		}
-		
+
 		session_start();
-		
+
 		if (array_key_exists('username', $_SESSION) && $username == $_SESSION['username']) {
 			return true;
 		}
-		
-		if ($message) {
-			throw new \Exception($message, 403);
-		} else {
-			return $this->redirect('login');
-		}
+
+		return false;
 	}
-	
+
+	/**
+	 * @return ServiceManager
+	 */
 	protected function getServiceManager()
 	{
 		return $this->serviceManager;
 	}
-	
-	protected function getFeedsModel()
-	{
-		if (!$this->feedsModel) {
-			$db = $this->getServiceManager()->get('db');
-			$this->feedsModel = new Model\Feeds($db);
-		}
 
-		return $this->feedsModel;
-	}
-
-	protected function getTagsModel()
-	{
-		if (!$this->tagsModel) {
-			$db = $this->getServiceManager()->get('db');
-			$this->tagsModel = new Model\Tags($db);
-		}
-
-		return $this->tagsModel;
-	}
-
-	protected function getEntriesModel()
-	{
-		if (!$this->entriesModel) {
-			$db = $this->getServiceManager()->get('db');
-			$this->entriesModel = new Model\Entries($db);
-		}
-
-		return $this->entriesModel;
-	}
-
+	/**
+	 * @param string $name
+	 * @param string $default (default: null)
+	 * @return string|null
+	 */
 	protected function getParam($name, $default = null)
 	{
 		if (!isset($_REQUEST[$name])) {
@@ -89,6 +76,10 @@ abstract class AbstractController
 		return filter_var($_REQUEST[$name], FILTER_SANITIZE_STRING);
 	}
 
+	/**
+	 * @param string $name
+	 * @return array|null
+	 */
 	protected function getFile($name)
 	{
 		if (isset($_FILES[$name])) {
@@ -98,27 +89,43 @@ abstract class AbstractController
 		return null;
 	}
 
+	/**
+	 * @return array
+	 */
 	protected function getQueryData()
 	{
 		return filter_var_array($_GET, FILTER_SANITIZE_STRING);
 	}
 
+	/**
+	 * @return array
+	 */
 	protected function getPostData()
 	{
 		return filter_var_array($_POST, FILTER_SANITIZE_STRING);
-	}	
+	}
 
+	/**
+	 * @return array
+	 */
 	protected function getInputData()
 	{
 		$content = file_get_contents("php://input");
 		return json_decode($content, true);
 	}
 
+	/**
+	 * @return string
+	 */
 	protected function getHttpMethod()
 	{
 		return strtolower($_SERVER['REQUEST_METHOD']);
 	}
 
+	/**
+	 * @param string $url (default: '')
+	 * @return void
+	 */
 	protected function redirect($url = '')
 	{
 		$url = App::getBasePath() . $url;

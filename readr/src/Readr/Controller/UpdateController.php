@@ -1,4 +1,11 @@
 <?php
+/**
+ * Readr
+ *
+ * @link    http://github.com/pabloprieto/Readr
+ * @author  Pablo Prieto
+ * @license http://opensource.org/licenses/GPL-3.0
+ */
 
 namespace Readr\Controller;
 
@@ -9,17 +16,17 @@ class UpdateController extends AbstractController
 
 	public function indexAction()
 	{
-		$limit = (int) $this->getParam('limit', 500);
-		
+		$feedsModel   = $this->getServiceManager()->get('feeds');
+		$entriesModel = $this->getServiceManager()->get('entries');
+	
 		$updater = new Updater(
-			$this->getFeedsModel(),
-			$this->getEntriesModel()
+			$feedsModel,
+			$entriesModel
 		);
 		
-		$updater->update($limit);
+		$updater->update(1000);
 
-		echo "Done." . PHP_EOL;
-		exit;
+		return "Done." . PHP_EOL;
 	}
 
 }
