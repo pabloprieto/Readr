@@ -64,7 +64,7 @@ class App
 	 */
 	public static function getRelease()
 	{
-		return array(0,5,1);
+		return array(0,6,0);
 	}
 
 	/**
@@ -72,7 +72,7 @@ class App
 	 */
 	public static function getVersion()
 	{
-		return 2013070201;
+		return 2013070801;
 	}
 
 	/**
