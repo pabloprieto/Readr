@@ -844,7 +844,11 @@ this.readr = this.readr||{};
 		
 		onKeyPress: function(event)
 		{
-			if (!this.currentEntry || event.metaKey) return;
+			// Ignore if:
+			// - No entry selected
+			// - The command key is pressed
+			// - Focus is on an input field
+			if (!this.currentEntry || event.metaKey || $(event.target).is(':input')) return;
 			
 			var code = event.which || event.keyCode;
 		
