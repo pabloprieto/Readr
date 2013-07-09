@@ -23,7 +23,6 @@ abstract class AbstractController
 
 	/**
 	 * @param ServiceManager $serviceManager
-	 * @return void
 	 */
 	public function __construct(ServiceManager $serviceManager)
 	{

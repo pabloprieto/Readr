@@ -26,7 +26,6 @@ class ServiceManager
 
 	/**
 	 * @param array $factories (default: array())
-	 * @return void
 	 */
 	public function __construct($factories = array())
 	{

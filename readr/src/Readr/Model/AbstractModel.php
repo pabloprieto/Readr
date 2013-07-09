@@ -21,7 +21,6 @@ abstract class AbstractModel
 
 	/**
 	 * @param PDO $db
-	 * @return void
 	 */
 	public function __construct(PDO $db)
 	{

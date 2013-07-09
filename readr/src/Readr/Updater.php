@@ -29,7 +29,6 @@ class Updater
 	/**
 	 * @param Feeds $feedsModel
 	 * @param Entries $entriesModel
-	 * @return void
 	 */
 	public function __construct(Feeds $feedsModel, Entries $entriesModel)
 	{
