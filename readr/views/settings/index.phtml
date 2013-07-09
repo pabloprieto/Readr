@@ -25,7 +25,7 @@
 
 			<h1>Authentication</h1>
 
-			<form action="<?= $this->basePath('settings') ?>" method="post">
+			<form action="<?= $this->basePath('settings/auth') ?>" method="post">
 
 				<?php if (count($this->errors)): ?>
 				<p class="error alert-block">
@@ -87,6 +87,34 @@
 
 			 </form>
 
+		</div>
+		
+		<div class="settings">
+		
+			<h1>Misc</h1>
+			
+			<form action="<?= $this->basePath('settings/misc') ?>" method="post">
+			
+				<div class="form-item">
+					<div class="controls">
+						 <label>
+						 	<input type="checkbox" name="emulateHTTP" value="1"<?= $this->emulateHTTP ? ' checked' : ''?>/>
+						 	Emulate HTTP
+						 </label>
+						 <span class="help-block">
+						 	Check this if read/favorite status are not properly saved
+						 </span>
+					</div>
+				</div>
+				
+				<div class="form-item">
+					 <div class="controls">
+		 				<button type="submit" class="btn btn-primary">Save</button>
+					 </div>
+				</div>
+			
+			</form>
+		
 		</div>
 
 		<div class="settings">

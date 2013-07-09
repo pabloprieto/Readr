@@ -10,6 +10,7 @@
 namespace Readr\Controller;
 
 use Readr\App;
+use Readr\Helper\FlashMessenger;
 use Readr\Updater;
 
 class SettingsController extends AbstractController
@@ -24,50 +25,70 @@ class SettingsController extends AbstractController
 
 	public function indexAction()
 	{
+		$settings  = $this->getServiceManager()->get('settings');
+		$messenger = new FlashMessenger();
+		
+		return array(
+			'errors'      => $messenger->getMessages('error'),
+			'username'    => $settings->get('username'),
+			'emulateHTTP' => $settings->get('emulateHTTP', 0),
+			'release'     => implode('.', App::getRelease()),
+			'version'     => App::getVersion()
+		);
+	}
+	
+	public function authAction()
+	{
 		$settings = $this->getServiceManager()->get('settings');
 		$data     = $this->getPostData();
-		$errors   = array();
+		
+		if (isset($data['username']) && !empty($data['username'])) {
+		
+			$messenger = new FlashMessenger();
 
-		if (!empty($data)) {
+			if (empty($data['password'])) {
 
-			if ($data['username']) {
+				$messenger->add('Password is empty', 'error');
 
-				if (empty($data['password'])) {
+			} elseif ($data['password'] == $data['password_confirm']) {
 
-					$errors[] = 'Password is empty';
+				$hash = password_hash($data['password'], PASSWORD_DEFAULT);
 
-				} elseif ($data['password'] == $data['password_confirm']) {
-
-					$hash = password_hash($data['password'], PASSWORD_DEFAULT);
-
-					$settings->set('username', $data['username']);
-					$settings->set('password', $hash);
-
-				} else {
-
-					$errors[] = 'Password and confirmation do not match.';
-
-				}
+				$settings->set('username', $data['username']);
+				$settings->set('password', $hash);
 
 			} else {
 
-				if (isset($_SESSION)) {
-					unset($_SESSION['username']);
-				}
-
-				$settings->delete('username');
-				$settings->delete('password');
+				$messenger->add('Password and confirmation do not match.', 'error');
 
 			}
 
-		}
+		} else {
 
-		return array(
-			'errors'   => $errors,
-			'username' => $settings->get('username'),
-			'release'  => implode('.', App::getRelease()),
-			'version'  => App::getVersion()
-		);
+			if (isset($_SESSION)) {
+				unset($_SESSION['username']);
+			}
+
+			$settings->delete('username');
+			$settings->delete('password');
+
+		}
+		
+		$this->redirect('settings');
+	}
+	
+	public function miscAction()
+	{
+		$settings = $this->getServiceManager()->get('settings');
+		$data     = $this->getPostData();
+			
+		if (isset($data['emulateHTTP'])) {
+			$settings->set('emulateHTTP', 1);
+		} else {
+			$settings->delete('emulateHTTP');
+		}
+		
+		$this->redirect('settings');
 	}
 
 	public function importAction()

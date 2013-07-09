@@ -119,6 +119,10 @@ abstract class AbstractController
 	 */
 	protected function getHttpMethod()
 	{
+		if (array_key_exists('HTTP_X_HTTP_METHOD_OVERRIDE', $_SERVER)) {
+			return strtolower($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']);
+		}
+		
 		return strtolower($_SERVER['REQUEST_METHOD']);
 	}
 

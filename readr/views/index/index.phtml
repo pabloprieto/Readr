@@ -233,6 +233,7 @@
 <script type="text/javascript">
 	var app = new readr.ReadrApp({
 		el: document.getElementById('readrApp'),
-		apiUrl: '<?= $this->basePath('api') ?>'
+		apiUrl: '<?= $this->basePath('api') ?>',
+		emulateHTTP: <?= $this->emulateHTTP ? 'true' : 'false' ?>
 	});
 </script>

@@ -24,7 +24,8 @@ class IndexController extends AbstractController
 		$settings = $this->getServiceManager()->get('settings');
 
 		return array(
-			'username' => $settings->get('username')
+			'username'    => $settings->get('username'),
+			'emulateHTTP' => $settings->get('emulateHTTP', 0)
 		);
 	}
 

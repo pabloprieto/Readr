@@ -422,6 +422,8 @@ this.readr = this.readr||{};
 
 		initialize: function()
 		{
+			Backbone.emulateHTTP = this.options.emulateHTTP;
+		
 			this.initFeeds();
 			this.initEntries();
 			this.initEvents();
