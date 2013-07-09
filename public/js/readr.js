@@ -81,7 +81,7 @@ this.readr = this.readr||{};
 					view.isLoading = false;
 					$form.find('[type=submit]').removeAttr('disabled');
 				},
-				success: function(data) {
+				success: function() {
 					view.trigger('added', this);
 					view.close();
 				},
@@ -561,7 +561,6 @@ this.readr = this.readr||{};
 		
 		fetchEntry: function(id)
 		{
-			var view  = this;
 			var entry = this.entries.get(id);
 		
 			if (!entry) {
@@ -635,15 +634,18 @@ this.readr = this.readr||{};
 
 			tags.sort();
 
-			for (var i = 0, l = tags.length; i < l; i++) {
+			var i, l, view;
+
+			for (i = 0, l = tags.length; i < l; i++) {
 				var tag = tags[i];
-				var view = new TagItemView({name: tag}).render();
+				view = new TagItemView({name: tag}).render();
 				this.listenTo(view, 'edit', this.onEditTag);
 				
 				var $item = $('<li/>');
+				var $feedsContainer = $('<ul></ul>');
+
 				$item.append(view.el);
 
-				$feedsContainer = $('<ul></ul>');
 				this.feeds.each(function(feed) {
 					if (feed.get('tags') == null) {
 						return;
@@ -666,8 +668,8 @@ this.readr = this.readr||{};
 				$container.append($item);
 			}
 			
-			for (var i = 0, l = unclassified.length; i < l; i++) {
-				var view = new FeedItemView({model: unclassified[i]}).render();
+			for (i = 0, l = unclassified.length; i < l; i++) {
+				view = new FeedItemView({model: unclassified[i]}).render();
 				this.listenTo(view, 'edit', this.onEditFeed);
 				$item = $('<li/>');
 				$item.append(view.el);
@@ -683,7 +685,7 @@ this.readr = this.readr||{};
 			this.$('.app-body').attr('data-mode', mode);
 		},
 
-		onSyncFeeds: function(model, resp, options)
+		onSyncFeeds: function()
 		{
 			this.buildFeedsMenu();
 			this.updateTitle();
@@ -697,10 +699,9 @@ this.readr = this.readr||{};
 			
 			this.toggleCollapse('#options', false);
 
-			var app = this;
 			var data = _.clone(this.params);
 			data.read = 1;
-			
+
 			Backbone.sync('update', this.entries, {data: JSON.stringify(data)});
 
 			this.entries.each(function(entry){
@@ -774,7 +775,7 @@ this.readr = this.readr||{};
 			this.$('.entries .loading').hide();
 		},
 
-		onResetEntries: function(collection, options)
+		onResetEntries: function()
 		{
 			var app = this;
 
@@ -783,7 +784,7 @@ this.readr = this.readr||{};
 			});
 		},
 
-		onAddEntry: function(model, collection, options)
+		onAddEntry: function(model)
 		{
 			this.addEntryItem(model);
 		},
@@ -827,7 +828,7 @@ this.readr = this.readr||{};
 			}
 		},
 		
-		onChangeRead: function(entry, value, options)
+		onChangeRead: function(entry, value)
 		{
 			var feed = this.feeds.get(entry.get('feed_id'));
 			var count = parseInt(feed.get('unread_count'));
