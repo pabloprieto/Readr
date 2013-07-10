@@ -1,3 +1,11 @@
+/**
+ * Readr
+ *
+ * @link	http://github.com/pabloprieto/Readr
+ * @author	Pablo Prieto
+ * @license http://opensource.org/licenses/GPL-3.0
+ */
+
 this.readr = this.readr||{};
 
 (function(){
@@ -24,6 +32,7 @@ this.readr = this.readr||{};
 		show: function()
 		{
 			this.$el.addClass('in');
+			this.delegateEvents();
 			return this;
 		},
 		
@@ -38,6 +47,7 @@ this.readr = this.readr||{};
 		close: function()
 		{
 			this.$el.removeClass('in');
+			this.undelegateEvents();
 			return this;
 		}
 		
@@ -45,6 +55,7 @@ this.readr = this.readr||{};
 	
 	var AddView = ModalView.extend({
 		
+		el: '#addModal',
 		isLoading: false,
 		
 		events: {
@@ -53,7 +64,6 @@ this.readr = this.readr||{};
 		
 		initialize: function()
 		{
-			this.setElement($('#addModal')[0]);
 			ModalView.prototype.initialize.apply(this);
 		},
 		
@@ -95,6 +105,7 @@ this.readr = this.readr||{};
 	
 	var FeedEditView = ModalView.extend({
 		
+		el: '#feedModal',
 		template: null,
 		
 		events: {
@@ -104,7 +115,6 @@ this.readr = this.readr||{};
 		
 		initialize: function()
 		{
-			this.setElement($('#feedModal')[0]);
 			this.template = _.template($('#feedForm').html());
 			ModalView.prototype.initialize.apply(this);
 		},
@@ -149,6 +159,7 @@ this.readr = this.readr||{};
 	
 	var TagEditView = ModalView.extend({
 		
+		el: '#tagModal',
 		template: null,
 		
 		events: {
@@ -158,7 +169,6 @@ this.readr = this.readr||{};
 		
 		initialize: function()
 		{
-			this.setElement($('#tagModal')[0]);
 			this.template = _.template($('#tagForm').html());
 			ModalView.prototype.initialize.apply(this);
 		},
@@ -196,14 +206,14 @@ this.readr = this.readr||{};
 		
 		onDelete: function()
 		{
-			var view	 = this;
+			var view  = this;
 			var $form = this.$('form');
 		
 			$.ajax({
 				type: 'DELETE',
 				url: $form.attr('action'),
 				complete: function(){
-					view.trigger('updated', this);
+					view.trigger('deleted', this);
 					view.close();
 				}
 			});
@@ -398,6 +408,7 @@ this.readr = this.readr||{};
 		
 		currentEntry: null,
 		
+		tagViews: {},
 		entryView: null,
 		addModal: null,
 		feedModal: null,
@@ -450,7 +461,7 @@ this.readr = this.readr||{};
 			this.feeds = new Feeds([], {
 				url: this.options.apiUrl + '/feeds'
 			});
-
+			
 			this.listenTo(this.feeds, 'sync', this.onSyncFeeds);
 		},
 
@@ -493,72 +504,6 @@ this.readr = this.readr||{};
 			this.isLoading = true;
 			this.entries.fetch({reset: reset, remove: reset, data: this.params});
 			this.params.offset += this.params.limit;
-		},
-		
-		updateTitle: function()
-		{
-			var title = 'All items';
-		
-			if (this.params.tag) {
-				title = this.params.tag;
-			} else if (this.feeds.length && this.params.feed_id && this.params.feed_id != 'all') {
-				title = this.feeds.get(this.params.feed_id).get('title');
-			}
-			
-			this.$('.app-header .feed-title').text(title);
-		},
-
-		setStatusFilter: function(name, value)
-		{
-			delete this.params.read;
-			delete this.params.favorite;
-			if(value != 'all') this.params[name] = value;
-
-			this.$('[data-toggle=filter-status]').each(function(i, e) {
-				var $e = $(e).removeClass('active');
-				if (
-					(value == 'all' && $e.attr('value') == value) ||
-					($e.attr('name') == name && $e.attr('value') == value)
-				) {
-					$e.addClass('active');
-				}
-			});
-		},
-
-		setSourceFilter: function(name, value)
-		{
-			delete this.params.feed_id;
-			delete this.params.tag;
-			if(value != 'all') this.params[name] = value;
-		},
-		
-		updateActiveSourceItem: function()
-		{
-			var name  = 'feed_id';
-			var value = 'all';
-			
-			if (this.params.tag) {
-				name = 'tag';
-				value = this.params.tag;
-			} else if (this.params.feed_id) {
-				value = this.params.feed_id;
-			}
-		
-			this.$('[data-toggle=filter-source]').each(function(i, e) {
-				var $e = $(e);
-				$e.parent().removeClass('active');
-				if (
-					(value == 'all' && $e.attr('value') == value) ||
-					($e.attr('name') == name && $e.attr('value') == value)
-				) {
-					$e.parent().addClass('active');
-				}
-			});
-		},
-		
-		toggleCollapse: function(selector, switcher)
-		{
-			this.$(selector).toggleClass('in', switcher);
 		},
 		
 		fetchEntry: function(id)
@@ -615,76 +560,164 @@ this.readr = this.readr||{};
 			this.listenTo(view, 'select', this.onSelectEntry);
 			this.$('.entries-list').append(view.el);
 		},
+
+		updateTitle: function()
+		{
+			var title = 'All items';
+		
+			if (this.params.tag) {
+				title = this.params.tag;
+			} else if (this.feeds.length && this.params.feed_id && this.params.feed_id != 'all') {
+				title = this.feeds.get(this.params.feed_id).get('title');
+			}
+			
+			this.$('.app-header .feed-title').text(title);
+		},
+
+		setStatusFilter: function(name, value)
+		{
+			delete this.params.read;
+			delete this.params.favorite;
+			if(value != 'all') this.params[name] = value;
+
+			this.$('[data-toggle=filter-status]').each(function(i, e) {
+				var $e = $(e).removeClass('active');
+				if (
+					(value == 'all' && $e.attr('value') == value) ||
+					($e.attr('name') == name && $e.attr('value') == value)
+				) {
+					$e.addClass('active');
+				}
+			});
+		},
+
+		setSourceFilter: function(name, value)
+		{
+			delete this.params.feed_id;
+			delete this.params.tag;
+			if(value != 'all') this.params[name] = value;
+		},
+		
+		updateActiveSourceItem: function()
+		{
+			var name  = 'feed_id';
+			var value = 'all';
+			
+			if (this.params.tag) {
+				name = 'tag';
+				value = this.params.tag;
+			} else if (this.params.feed_id) {
+				value = this.params.feed_id;
+			}
+			
+			this.$('.feeds .active').removeClass('active');
+		
+			this.$('[data-toggle=filter-source]').each(function(i, e) {
+				var $e = $(e);
+				if (
+					(value == 'all' && $e.attr('value') == value) ||
+					($e.attr('name') == name && $e.attr('value') == value)
+				) {
+					$e.parent().addClass('active');
+				}
+			});
+		},
+		
+		toggleCollapse: function(selector, switcher)
+		{
+			this.$(selector).toggleClass('in', switcher);
+		},
 		
 		buildFeedsMenu: function()
 		{
-			var app = this;
 			var $container = this.$('.feeds-list').empty();
-			var tags = new Array;
-			var unclassified = new Array;
+			var tags = [], unclassified = [];
+			var i, l, j, k, feed, view;
 			
-			this.feeds.each(function(feed) {
+			for (i = 0, l = this.feeds.length; i < l; i++) {
+				
+				feed = this.feeds.at(i);
+				
 				if (!feed.get('tags')) {
 					unclassified.push(feed);
-					return;
+					continue;
 				}
-				var t = feed.get('tags').split(',');
-				for (var i = 0, l = t.length; i < l; i++) {
-					if (_.indexOf(tags, t[i]) == -1) tags.push(t[i]);
-				}
-			});
+				
+				tags = tags.concat(feed.get('tags').split(','));
+				
+			}
 
-			tags.sort();
-
-			var i, l, view;
+			tags = _.uniq(tags.sort(), true);
 
 			for (i = 0, l = tags.length; i < l; i++) {
-				var tag = tags[i];
-				view = new TagItemView({name: tag}).render();
-				this.listenTo(view, 'edit', this.onEditTag);
 				
-				var $item = $('<li/>');
-				var $feedsContainer = $('<ul></ul>');
-
-				$item.append(view.el);
-
-				this.feeds.each(function(feed) {
-					if (feed.get('tags') == null) {
-						return;
-					}
+				var $list = $('<ul></ul>');
+				var $item = $('<li/>').append(
+					this.getTagItemView(tags[i]).render().el
+				);
+				
+				for (j = 0, k = this.feeds.length; j < k; j++) {
+					
+					feed = this.feeds.at(j);
+					
+					if (!feed.get('tags')) continue;
+					
 					var t = feed.get('tags').split(',');
-					if (_.indexOf(t, tag) > -1) {
-						
-						var view = new FeedItemView({model: feed}).render();
-						app.listenTo(view, 'edit', app.onEditFeed);
-						
-						var $item = $('<li/>');
-						$item.append(view.el);
-						
-						$feedsContainer.append($item);
-						
+					
+					if (_.indexOf(t, tags[i]) > -1) {
+						$list.append(
+							$('<li/>').append(this.getFeedItemView(feed).render().el)
+						);
 					}
-				});
+					
+				}
 
-				$item.append($feedsContainer);
-				$container.append($item);
+				$container.append(
+					$item.append($list)
+				);
+				
 			}
 			
 			for (i = 0, l = unclassified.length; i < l; i++) {
-				view = new FeedItemView({model: unclassified[i]}).render();
-				this.listenTo(view, 'edit', this.onEditFeed);
-				$item = $('<li/>');
-				$item.append(view.el);
-				$container.append($item);
+				$container.append(
+					$('<li/>').append(this.getFeedItemView(unclassified[i]).render().el)
+				);
 			}
 			
 			this.updateActiveSourceItem();
+		},
+		
+		getTagItemView: function(name)
+		{
+			if (!this.tagViews[name]) {
+				var view = new TagItemView({name: name});
+				this.listenTo(view, 'edit', this.onEditTag);
+				this.tagViews[name] = view;
+			} else {
+				this.tagViews[name].delegateEvents();
+			}
+			
+			return this.tagViews[name];
+		},
+	
+		getFeedItemView: function(feed)
+		{
+			var view = new FeedItemView({model: feed});
+			this.listenTo(view, 'edit', this.onEditFeed);
+			
+			return view;
 		},
 		
 		setMode: function(mode)
 		{
 			if (!mode) mode = 'entries';
 			this.$('.app-body').attr('data-mode', mode);
+		},
+		
+		onFeedChange: function(feed)
+		{
+			this.buildFeedsMenu();
+			this.updateTitle();	
 		},
 
 		onSyncFeeds: function()
@@ -760,8 +793,7 @@ this.readr = this.readr||{};
 		{
 			if (!this.tagModal) {
 				this.tagModal = new TagEditView();
-				this.listenTo(this.tagModal, 'updated', this.fetchFeeds);
-				this.listenTo(this.tagModal, 'deleted', this.fetchFeeds);
+				this.listenTo(this.tagModal, 'updated deleted', this.fetchFeeds);
 			}
 			
 			this.tagModal.setTag(name).show();
