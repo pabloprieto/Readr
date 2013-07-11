@@ -460,9 +460,11 @@ this.readr = this.readr||{};
 
 		initFeeds: function()
 		{
-			this.feeds = new Feeds(this.options.feeds, {
+			this.feeds = new Feeds([], {
 				url: this.options.apiUrl + '/feeds'
 			});
+			
+			this.feeds.reset(this.options.feeds);
 			
 			this.listenTo(this.feeds, 'change:tags', this.buildFeedsMenu);
 			this.listenTo(this.feeds, 'remove', this.buildFeedsMenu);
