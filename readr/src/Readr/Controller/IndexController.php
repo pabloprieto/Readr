@@ -22,8 +22,10 @@ class IndexController extends AbstractController
 	public function indexAction()
 	{
 		$settings = $this->getServiceManager()->get('settings');
+		$feeds    = $this->getServiceManager()->get('feeds');
 
 		return array(
+			'feeds'       => $feeds->fetchAll(),
 			'username'    => $settings->get('username'),
 			'emulateHTTP' => $settings->get('emulateHTTP', 0),
 			'collapsed'   => $settings->get('collapsed', '{}')

@@ -441,9 +441,8 @@ this.readr = this.readr||{};
 			this.initFeeds();
 			this.initEntries();
 			this.initEvents();
-			this.fetchFeeds();
-			
-			this.listenToOnce(this.feeds, 'sync', this.initRouter);
+			this.initRouter();
+			this.buildFeedsMenu();
 		},
 		
 		initEvents: function()
@@ -461,11 +460,12 @@ this.readr = this.readr||{};
 
 		initFeeds: function()
 		{
-			this.feeds = new Feeds([], {
+			this.feeds = new Feeds(this.options.feeds, {
 				url: this.options.apiUrl + '/feeds'
 			});
 			
-			this.listenTo(this.feeds, 'sync', this.onSyncFeeds);
+			this.listenTo(this.feeds, 'change:tags', this.buildFeedsMenu);
+			this.listenTo(this.feeds, 'remove', this.buildFeedsMenu);
 		},
 
 		initEntries: function()
@@ -727,14 +727,6 @@ this.readr = this.readr||{};
 		{
 			this.buildFeedsMenu();
 			this.updateTitle();	
-		},
-
-		onSyncFeeds: function()
-		{
-			this.buildFeedsMenu();
-			this.updateTitle();
-			this.listenTo(this.feeds, 'change:tags', this.buildFeedsMenu);
-			this.listenTo(this.feeds, 'remove', this.buildFeedsMenu);
 		},
 
 		onMarkAsRead: function(event)

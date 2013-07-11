@@ -233,6 +233,7 @@
 <script type="text/javascript">
 	var app = new readr.ReadrApp({
 		el: document.getElementById('readrApp'),
+		feeds: <?= json_encode($this->feeds) ?>,
 		apiUrl: '<?= $this->basePath('api') ?>',
 		settingsUrl: '<?= $this->basePath('settings') ?>',
 		emulateHTTP: <?= $this->emulateHTTP ? 'true' : 'false' ?>,
