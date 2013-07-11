@@ -52,6 +52,9 @@ Pablo Prieto, [pabloprieto.net](http://pabloprieto.net/)
 
 ## Changelog
 
+* **v0.7**
+	- 'Emulate HTTP' option added for compatibility with servers that don't support default REST/HTTP approach
+	- Remember expanded/collapsed state in the feeds menu
 * **v0.6**
 	- Responsive design
 	- Direct urls to feeds, tags and entries
