@@ -234,6 +234,8 @@
 	var app = new readr.ReadrApp({
 		el: document.getElementById('readrApp'),
 		apiUrl: '<?= $this->basePath('api') ?>',
-		emulateHTTP: <?= $this->emulateHTTP ? 'true' : 'false' ?>
+		settingsUrl: '<?= $this->basePath('settings') ?>',
+		emulateHTTP: <?= $this->emulateHTTP ? 'true' : 'false' ?>,
+		collapsed: <?= $this->collapsed ?>
 	});
 </script>

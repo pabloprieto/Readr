@@ -246,6 +246,9 @@ this.readr = this.readr||{};
 		{
 			event.stopImmediatePropagation();
 			this.$el.parent().toggleClass('collapse').find('ul').slideToggle(200);
+			
+			var isCollapsed = this.$el.parent().hasClass('collapse');
+			this.trigger('collapse', this.options.name, isCollapsed);
 		},
 		
 		onEdit: function(event)
@@ -656,6 +659,11 @@ this.readr = this.readr||{};
 					this.getTagItemView(tags[i]).render().el
 				);
 				
+				if (this.options.collapsed[tags[i]]) {
+					$item.addClass('collapse');
+					$list.hide();
+				}
+				
 				for (j = 0, k = this.feeds.length; j < k; j++) {
 					
 					feed = this.feeds.at(j);
@@ -692,6 +700,7 @@ this.readr = this.readr||{};
 			if (!this.tagViews[name]) {
 				var view = new TagItemView({name: name});
 				this.listenTo(view, 'edit', this.onEditTag);
+				this.listenTo(view, 'collapse', this.onCollapseTag);
 				this.tagViews[name] = view;
 			} else {
 				this.tagViews[name].delegateEvents();
@@ -797,6 +806,20 @@ this.readr = this.readr||{};
 			}
 			
 			this.tagModal.setTag(name).show();
+		},
+		
+		onCollapseTag: function(name, value)
+		{
+			this.options.collapsed[name] = value;
+						
+			$.ajax({
+				type: 'POST',
+				data: {
+					name: name, 
+					collapsed: value ? 1 : 0
+				},
+				url: this.options.settingsUrl + '/collapsed'
+			});
 		},
 		
 		onSyncEntries: function(model, resp)

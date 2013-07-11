@@ -90,6 +90,28 @@ class SettingsController extends AbstractController
 		
 		$this->redirect('settings');
 	}
+	
+	public function collapsedAction()
+	{
+		$data = $this->getPostData();
+		
+		if (isset($data['name'])) {
+			
+			$settings  = $this->getServiceManager()->get('settings');
+			$collapsed = json_decode($settings->get('collapsed', '{}'));
+			
+			if (!$data['collapsed']) {
+				unset($collapsed->$data['name']);
+			} else {
+				$collapsed->$data['name'] = 1;
+			}
+			
+			$settings->set('collapsed', json_encode($collapsed));
+			
+		}
+		
+		return false;
+	}
 
 	public function importAction()
 	{

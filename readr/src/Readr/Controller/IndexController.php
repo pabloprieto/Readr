@@ -25,7 +25,8 @@ class IndexController extends AbstractController
 
 		return array(
 			'username'    => $settings->get('username'),
-			'emulateHTTP' => $settings->get('emulateHTTP', 0)
+			'emulateHTTP' => $settings->get('emulateHTTP', 0),
+			'collapsed'   => $settings->get('collapsed', '{}')
 		);
 	}
 
