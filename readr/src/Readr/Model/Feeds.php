@@ -16,9 +16,9 @@ class Feeds extends AbstractModel
 
 	public function fetch($id)
 	{
-		$sql = "SELECT feeds.*, COALESCE(tags.name,',') AS tags FROM feeds
-		        LEFT JOIN tags ON tags.feed_id = feeds.id
-		        WHERE id = :id LIMIT 1";
+		$sql = "SELECT feeds.*, GROUP_CONCAT(tags.name,',') AS tags FROM feeds
+		        LEFT JOIN tags ON tags.feed_id = feeds.id WHERE id = :id
+		        GROUP BY feeds.id LIMIT 1";
 
 		$statement = $this->getDb()->prepare($sql);
 		$statement->execute(array(
@@ -32,7 +32,7 @@ class Feeds extends AbstractModel
 	{
 		$sql = "SELECT
 		        feeds.*,
-		        (SELECT COALESCE(tags.name, ',') FROM tags WHERE tags.feed_id = feeds.id) AS tags,
+		        (SELECT GROUP_CONCAT(tags.name, ',') FROM tags WHERE tags.feed_id = feeds.id) AS tags,
 		        COUNT(entries.id) AS entries_count,
 		        SUM(CASE WHEN entries.read = 0 THEN 1 ELSE 0 END) AS unread_count
 		        FROM feeds

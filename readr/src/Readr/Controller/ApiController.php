@@ -39,6 +39,8 @@ class ApiController extends AbstractController
 				)), 404);
 			}
 		}
+		
+		$tagsModel = $this->getServiceManager()->get('tags');
 
 		switch ($method) {
 
@@ -51,11 +53,11 @@ class ApiController extends AbstractController
 						$data['title'],
 						$data['url']
 					);
+					
+					$tagsModel->remove($id);
 
 					if ($data['tags']) {
 						$tags = explode(',', $data['tags']);
-						$tagsModel = $this->getServiceManager()->get('tags');
-						$tagsModel->remove($id);
 						foreach ($tags as $tag) {
 							$tagsModel->insert($tag, $id);
 						}
@@ -107,7 +109,6 @@ class ApiController extends AbstractController
 
 				if ($data['tags']) {
 					$tags = explode(',', $data['tags']);
-					$tagsModel = $this->getServiceManager()->get('tags');
 					foreach ($tags as $tag) {
 						$tagsModel->insert($tag, $id);
 					}

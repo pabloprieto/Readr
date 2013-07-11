@@ -25,7 +25,6 @@ class View
 	/**
 	 * @param string $path
 	 * @param array $data (default: null)
-	 * @return void
 	 */
 	public function __construct($path, array $data = null)
 	{
