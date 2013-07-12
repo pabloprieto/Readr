@@ -1,3 +1,23 @@
+@-webkit-keyframes spin {
+	from { -webkit-transform: rotate(0deg); }
+	to { -webkit-transform: rotate(360deg); }
+}
+
+@-moz-keyframes spin {
+	from { -moz-transform: rotate(0deg); }
+	to { -moz-transform: rotate(360deg); }
+}
+
+@-o-keyframes spin {
+	from { -o-transform: rotate(0deg); }
+	to { -o-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+	from { transform: rotate(0deg); }
+	to { transform: rotate(360deg); }
+}
+
 html {
 	height: 100%;
 }
@@ -145,6 +165,12 @@ button {
 	border: 1px solid #b4b4b4;
 }
 
+.spin {
+	-webkit-animation: spin 1s infinite linear;
+	   -moz-animation: spin 1s infinite linear;
+	        animation: spin 1s infinite linear;
+}
+
 .btn {
 	display: inline-block;
 	line-height: 28px;
@@ -153,6 +179,7 @@ button {
 	padding: 0 10px;
 	color: #fff;
 	text-transform: uppercase;
+	text-decoration: none !important;
 }
 
 .btn.active {
