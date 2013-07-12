@@ -27,38 +27,40 @@
 
 			<form action="<?= $this->basePath('settings/auth') ?>" method="post">
 
-				<?php if (count($this->errors)): ?>
-				<p class="error alert-block">
-					<?= implode('<br/>', $this->errors) ?>
-				</p>
-				<?php endif; ?>
-
 				<div class="form-item">
 					<label class="form-label">Username</label>
 					<div class="controls">
-						 <input type="text" name="username" value="<?= $this->escape($this->username) ?>"/>
-						 <span class="help-block">Leave blank to disable authentication</span>
+						<input type="text" name="username" value="<?= $this->escape($this->username) ?>"/>
+						<span class="help-block">Leave blank to disable authentication</span>
 					</div>
 				</div>
 
 				<div class="form-item">
 					<label class="form-label">Password</label>
 					<div class="controls">
-						 <input type="password" name="password"/>
+						<input type="password" name="password"/>
 					</div>
 				</div>
 
 				<div class="form-item">
 					<label class="form-label">Confirm</label>
 					<div class="controls">
-						 <input type="password" name="password_confirm"/>
+						<input type="password" name="password_confirm"/>
 					</div>
 				</div>
+				
+				<?php if ($this->messenger->hasMessages('auth-error')): ?>
+				<div class="form-item error">
+					<div class="controls">
+						<?= implode('<br/>', $this->messenger->getMessages('auth-error')) ?>
+					</div>
+				</div>
+				<?php endif; ?>
 
 				<div class="form-item">
 					<div class="controls">
-						 <div class="error error-block"></div>
-						 <button type="submit" class="btn btn-primary">Save</button>
+						<div class="error error-block"></div>
+						<button type="submit" class="btn btn-primary" data-loading-text="Saving…">Save</button>
 					</div>
 				</div>
 
@@ -72,20 +74,34 @@
 
 			<form action="<?= $this->basePath('settings/import') ?>" method="post" enctype="multipart/form-data">
 
-				 <div class="form-item">
-					 <label class="form-label">File</label>
-					 <div class="controls input">
-						 <input type="file" name="file"/>
-					 </div>
-				 </div>
-
-				 <div class="form-item">
-					 <div class="controls">
-		 				<button type="submit" class="btn btn-primary">Import</button>
-					 </div>
+				<div class="form-item">
+					<div class="controls">
+						<a href="<?= $this->basePath('settings/export') ?>" class="btn btn-primary">Export subscriptions</a>
+					</div>
 				</div>
 
-			 </form>
+				<div class="form-item">
+					<label class="form-label">File</label>
+					<div class="controls input">
+						<input type="file" name="file"/>
+					</div>
+				</div>
+				
+				<?php if ($this->messenger->hasMessages('import-error')): ?>
+				<div class="form-item error">
+					<div class="controls">
+						<?= implode('<br/>', $this->messenger->getMessages('import-error')) ?>
+					</div>
+				</div>
+				<?php endif; ?>
+
+				<div class="form-item">
+					<div class="controls">
+						<button type="submit" class="btn btn-primary" data-loading-text="Importing…">Import</button>
+					</div>
+				</div>
+
+			</form>
 
 		</div>
 		
@@ -97,20 +113,20 @@
 			
 				<div class="form-item">
 					<div class="controls">
-						 <label>
-						 	<input type="checkbox" name="emulateHTTP" value="1"<?= $this->emulateHTTP ? ' checked' : ''?>/>
-						 	Emulate HTTP
-						 </label>
-						 <span class="help-block">
-						 	Check this if read/favorite status are not properly saved
-						 </span>
+						<label>
+							<input type="checkbox" name="emulateHTTP" value="1"<?= $this->emulateHTTP ? ' checked' : ''?>/>
+							Emulate HTTP
+						</label>
+						<span class="help-block">
+							Check this if read/favorite status are not properly saved
+						</span>
 					</div>
 				</div>
 				
 				<div class="form-item">
-					 <div class="controls">
-		 				<button type="submit" class="btn btn-primary">Save</button>
-					 </div>
+					<div class="controls">
+						<button type="submit" class="btn btn-primary" data-loading-text="Saving…">Save</button>
+					</div>
 				</div>
 			
 			</form>
@@ -134,3 +150,19 @@
 	</div>
 
 </div>
+
+<script>
+
+	$('form').on('submit', function(event){
+		event.preventDefault();
+		var $buttons = $(this).find('[type=submit]');
+		$buttons.attr('disabled', true).addClass('loading').each(function(i,e){
+			var $e = $(e);
+			var text = $e.attr('data-loading-text');
+			if (text) $e.text(text);
+		});
+		
+		$(this).off('submit').submit();
+	});
+
+</script>
