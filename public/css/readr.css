@@ -84,8 +84,10 @@ button {
 	cursor: pointer;
 }
 
-.wrap {
-	overflow: hidden;
+button::-moz-focus-inner {
+	border: none;
+	padding: 0;
+	margin: 0;
 }
 
 .pull-left {
@@ -342,18 +344,10 @@ button {
 	right: 0;
 }
 
-.feeds {
-	
-}
-
 .feeds .item {
 	position: relative;
 	line-height: 20px;
 	padding: 5px 24px 5px 5px;
-}
-
-.feeds .tag-item {
-
 }
 
 .feeds .active {
@@ -362,11 +356,6 @@ button {
 
 .feeds ul ul .item {
 	padding-left: 32px;
-}
-
-.feeds .item button {
-	display: block;
-	width: 100%;
 }
 
 .feeds .item .actions {
@@ -381,6 +370,11 @@ button {
 	display: block;
 }
 
+.feeds .item .title {
+	display: inline-block;
+	width: 120px;
+}
+
 .feeds .item .count {
 	display: inline-block;
 	vertical-align: top;
@@ -388,8 +382,7 @@ button {
 }
 
 .feeds .item [class^=icon-] {
-	vertical-align: top;
-	margin-top: 3px;
+	margin-top: 2px;
 }
 
 .feeds .item .icon-arrow {
@@ -409,8 +402,8 @@ button {
 }
 
 .feeds .item .icon-favicon {
-	float: left;
-	margin: 0 4px 0 0;
+	margin: 0;
+	vertical-align: top;
 }
 
 .entries {
