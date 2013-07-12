@@ -466,8 +466,7 @@ this.readr = this.readr||{};
 			
 			this.feeds.reset(this.options.feeds);
 			
-			this.listenTo(this.feeds, 'change:tags', this.buildFeedsMenu);
-			this.listenTo(this.feeds, 'remove', this.buildFeedsMenu);
+			this.listenTo(this.feeds, 'sync change:tags remove', this.buildFeedsMenu);
 		},
 
 		initEntries: function()
