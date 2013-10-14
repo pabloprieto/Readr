@@ -40,7 +40,7 @@ class LoginController extends AbstractController
 	public function signoutAction()
 	{
 		session_start();
-		unset($_SESSION['username']);
+		session_destroy();
 		$this->redirect();
 	}
 
@@ -58,6 +58,8 @@ class LoginController extends AbstractController
 			password_verify($password, $settings->get('password'))
 		) {
 			session_start();
+			session_set_cookie_params(86400*30);
+			session_regenerate_id(true);
 			$_SESSION['username'] = $username;
 			return true;
 		}
