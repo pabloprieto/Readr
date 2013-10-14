@@ -122,6 +122,11 @@ this.readr = this.readr||{};
 		render: function()
 		{
 			this.$el.html(this.template(this.model.attributes));
+			this.$('[name=tags]').tagsInput({
+				autocomplete_url: this.options.autocompleteUrl,
+				height:'auto',
+				width:'auto'
+			});
 			return this;
 		},
 		
@@ -785,7 +790,9 @@ this.readr = this.readr||{};
 		onEditFeed: function(feed)
 		{
 			if (!this.feedModal) {
-				this.feedModal = new FeedEditView();
+				this.feedModal = new FeedEditView({
+					autocompleteUrl: this.options.apiUrl + '/tags'
+				});
 			}
 			
 			this.feedModal.setModel(feed).show();

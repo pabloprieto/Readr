@@ -31,6 +31,13 @@ class Tags extends AbstractModel
 		return $statement->fetchAll(PDO::FETCH_ASSOC);
 	}
 
+	public function search($value)
+	{
+		$statement = $this->getDb()->prepare("SELECT DISTINCT name AS label FROM tags WHERE name LIKE :value");
+		$statement->execute(array('value' => $value . '%'));
+		return $statement->fetchAll(PDO::FETCH_ASSOC);
+	}
+
 	public function insert($name, $feed_id)
 	{
 		$statement = $this->getDb()->prepare("INSERT INTO tags (name,feed_id) VALUES (:name,:feed_id)");
