@@ -122,6 +122,11 @@ this.readr = this.readr||{};
 		render: function()
 		{
 			this.$el.html(this.template(this.model.attributes));
+			this.$('[name=tags]').tagsInput({
+				autocomplete_url: this.options.autocompleteUrl,
+				height:'auto',
+				width:'auto'
+			});
 			return this;
 		},
 		
@@ -448,7 +453,7 @@ this.readr = this.readr||{};
 		initEvents: function()
 		{
 			this.$('.entries').on('scroll', $.proxy(this.onScrollEntries, this));
-			this.$('.entry').hammer().on('swipeleft swiperight', $.proxy(this.onSwipeEntry, this));
+			this.$('.entry').hammer({stop_browser_behavior:null}).on('swipeleft swiperight', $.proxy(this.onSwipeEntry, this));
 			$(document).on('keypress', $.proxy(this.onKeyPress, this));
 		},
 		
@@ -785,7 +790,9 @@ this.readr = this.readr||{};
 		onEditFeed: function(feed)
 		{
 			if (!this.feedModal) {
-				this.feedModal = new FeedEditView();
+				this.feedModal = new FeedEditView({
+					autocompleteUrl: this.options.apiUrl + '/tags'
+				});
 			}
 			
 			this.feedModal.setModel(feed).show();

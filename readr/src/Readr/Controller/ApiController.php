@@ -169,7 +169,7 @@ class ApiController extends AbstractController
 
 		if ($name) {
 			$name = urldecode($name);
-			$tag	 = $model->fetch($name);
+			$tag  = $model->fetch($name);
 
 			if (!$tag) {
 				throw new \Exception(json_encode(array(
@@ -201,10 +201,13 @@ class ApiController extends AbstractController
 			default:
 				if ($name) {
 					return json_encode($tag);
+				} elseif ($term = $this->getParam('term')) {
+					$tags = $model->search($term);
 				} else {
 					$tags = $model->fetchAll();
-					return json_encode($tags);
 				}
+				
+				return json_encode($tags);
 
 		}
 
