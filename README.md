@@ -52,6 +52,9 @@ Pablo Prieto, [pabloprieto.net](http://pabloprieto.net/)
 
 ## Changelog
 
+* **v0.8**
+	- New autocomplete UI for tags
+	- Export subscriptions as OPML file
 * **v0.7**
 	- 'Emulate HTTP' option added for compatibility with servers that don't support default REST/HTTP approach
 	- Remember expanded/collapsed state in the feeds menu
