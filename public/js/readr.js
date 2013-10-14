@@ -448,7 +448,7 @@ this.readr = this.readr||{};
 		initEvents: function()
 		{
 			this.$('.entries').on('scroll', $.proxy(this.onScrollEntries, this));
-			this.$('.entry').hammer().on('swipeleft swiperight', $.proxy(this.onSwipeEntry, this));
+			this.$('.entry').hammer({stop_browser_behavior:null}).on('swipeleft swiperight', $.proxy(this.onSwipeEntry, this));
 			$(document).on('keypress', $.proxy(this.onKeyPress, this));
 		},
 		
