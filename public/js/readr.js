@@ -567,9 +567,6 @@ this.readr = this.readr||{};
 		{
 			this.setMode('entry');
 		
-			this.$('.entries-list > .active').removeClass('active');
-			this.$('.entries-list > [data-id=' + entry.id + ']').addClass('active');
-
 			if (entry.get('read') == 0) {
 				entry.save({read:1}, {patch: true});
 			}
@@ -584,6 +581,26 @@ this.readr = this.readr||{};
 			this.entryView.setModel(entry);
 			
 			this.currentEntry = entry;
+			
+			var $entries = this.$('.entries');
+			$entries.find('.active').removeClass('active');
+			
+			var $item = $entries.find('[data-id=' + entry.id + ']').addClass('active');
+			
+			// Center scroll position to entry if necessary
+			if ($item.length) {
+				var eh = $entries.height(), 
+				    it = $item.position().top, 
+				    ih = $item.outerHeight();
+				
+				if (it < 0) {
+					var st = $entries.scrollTop();
+					$entries.animate({scrollTop: st - eh/2}, 200);
+				} else if (it+ih > eh) {
+					var st = $entries.scrollTop();
+					$entries.animate({scrollTop: st + eh/2}, 200);
+				}
+			}
 		},
 
 		addEntryItem: function(entry)
