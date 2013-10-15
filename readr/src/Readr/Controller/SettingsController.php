@@ -33,6 +33,7 @@ class SettingsController extends AbstractController
 			'messenger'   => $messenger,
 			'username'    => $settings->get('username'),
 			'emulateHTTP' => $settings->get('emulateHTTP', 0),
+			'deleteAfter' => $settings->get('deleteAfter', null),
 			'release'     => implode('.', App::getRelease()),
 			'version'     => App::getVersion()
 		);
@@ -89,6 +90,13 @@ class SettingsController extends AbstractController
 			$settings->delete('emulateHTTP');
 		}
 		
+		$deleteAfter = intval($data['deleteAfter']);
+		if ($deleteAfter > 0) {
+			$settings->set('deleteAfter', $deleteAfter);
+		} else {
+			$settings->delete('deleteAfter');
+		}
+
 		$this->redirect('settings');
 	}
 	

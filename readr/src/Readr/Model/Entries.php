@@ -125,5 +125,15 @@ class Entries extends AbstractModel
 
 		return $statement->rowCount();
 	}
+	
+	public function deleteAll($date)
+	{
+		$statement = $this->getDb()->prepare("DELETE FROM entries WHERE date < :date");
+		$statement->execute(array(
+			':date' => $date,
+		));
+
+		return $statement->rowCount();
+	}
 
 }

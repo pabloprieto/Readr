@@ -125,6 +125,18 @@
 				
 				<div class="form-item">
 					<div class="controls">
+						<label>
+							Delete entries older than
+							<input type="number" name="deleteAfter" size="3" class="inline" style="width:4em" min="0" value="<?= $this->deleteAfter ?>"/> days
+						</label>
+						<span class="help-block">
+							If empty, entries are never deleted.
+						</span>
+					</div>
+				</div>
+				
+				<div class="form-item">
+					<div class="controls">
 						<button type="submit" class="btn btn-primary" data-loading-text="Saving…">Save</button>
 					</div>
 				</div>

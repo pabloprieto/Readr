@@ -42,7 +42,7 @@ h1, h2, h3, h4, h5, h6, p, ul, input, select, textarea, button {
 	list-style: none;
 }
 
-input[type=text], input[type=password], input[type=email], input[type=url], textarea {
+input[type=text], input[type=password], input[type=email], input[type=url], input[type=number], textarea {
 	border: 2px solid #bdc3c7;
 	border-radius: 0;
 	padding: 6px;
@@ -56,9 +56,16 @@ input[type=text], input[type=password], input[type=email], input[type=url], text
 	        box-sizing: border-box;
 }
 
-input[type=text]:focus, input[type=password]:focus, input[type=email]:focus, input[type=url]:focus, textarea:focus {
+input[type=text]:focus, input[type=password]:focus, input[type=email]:focus, input[type=url]:focus, input[type=number]:focus, textarea:focus {
 	outline: none;
 	border-color: #818c99;
+}
+
+input.inline {
+	padding: 3px;
+	border-width: 1px;
+	vertical-align: baseline;
+	width: auto;
 }
 
 img {
