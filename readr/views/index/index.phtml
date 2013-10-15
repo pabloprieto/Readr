@@ -109,8 +109,9 @@
 	<button type="button" data-toggle="subnav">
 		<i class="icon-arrow"></i>
 	</button>
-	<button type="button" data-toggle="filter-source" name="tag" value="<%= name %>">
+	<button type="button" class="title" data-toggle="filter-source" name="tag" value="<%= name %>">
 		<%- name %>
+		<span class="count"></span>
 	</button>
 	<div class="actions">
 		<button type="button" data-toggle="edit" title="Edit…">
@@ -124,7 +125,7 @@
 		<img src="<?= $this->basePath() ?>api/favicon/<%= id %>" class="icon-favicon" alt=""/>
 		<span class="title">
 			<%- title %>
-			<span class="count">(<%= unread_count %>)</span>
+			<span class="count"></span>
 		</span>
 	</button>
 	<div class="actions">

@@ -229,6 +229,7 @@ this.readr = this.readr||{};
 	var TagItemView = Backbone.View.extend({
 		
 		el: '<div class="item tag-item"></div>',
+		feeds: null,
 		template: null,
 
 		events: {
@@ -239,12 +240,30 @@ this.readr = this.readr||{};
 		initialize: function()
 		{
 			this.template = _.template($('#tagItem').html());
+			this.feeds = new Feeds;
+			this.listenTo(this.feeds, 'remove add change:unread_count', this.updateUnreadCount);
 		},
 
 		render: function()
 		{
 			this.$el.html(this.template({name: this.options.name}));
 			return this;
+		},
+		
+		attachFeed: function(feed)
+		{
+			this.feeds.add(feed);
+		},
+		
+		updateUnreadCount: function()
+		{
+			var count = 0;
+			this.feeds.each(function(feed){
+				count += parseInt(feed.get('unread_count'));
+			});
+			
+			this.$('.count').text('(' + count + ')');
+			this.$el.toggleClass('unread', count > 0);
 		},
 
 		onToggleSubnav: function(event)
@@ -274,12 +293,21 @@ this.readr = this.readr||{};
 
 		initialize: function(){
 			this.template = _.template($('#feedItem').html());
-			this.listenTo(this.model, 'change:title change:unread_count', this.render);
+			this.listenTo(this.model, 'change:title', this.render);
+			this.listenTo(this.model, 'change:unread_count', this.updateUnreadCount);
 		},
 
 		render: function(){
 			this.$el.html(this.template(this.model.attributes));
+			this.updateUnreadCount();
 			return this;
+		},
+		
+		updateUnreadCount: function()
+		{
+			var count = parseInt(this.model.get('unread_count'));
+			this.$('.count').text('(' + count + ')');
+			this.$el.toggleClass('unread', count > 0);
 		},
 
 		onEdit: function(event)
@@ -661,14 +689,18 @@ this.readr = this.readr||{};
 			for (i = 0, l = tags.length; i < l; i++) {
 				
 				var $list = $('<ul></ul>');
-				var $item = $('<li/>').append(
-					this.getTagItemView(tags[i]).render().el
-				);
+				
+				var tagView = this.getTagItemView(tags[i]).render();
+				tagView.feeds.reset();
+				
+				var $item = $('<li/>').append(tagView.el);
 				
 				if (this.options.collapsed[tags[i]]) {
 					$item.addClass('collapse');
 					$list.hide();
 				}
+				
+				var unreadCount = 0;
 				
 				for (j = 0, k = this.feeds.length; j < k; j++) {
 					
@@ -679,13 +711,19 @@ this.readr = this.readr||{};
 					var t = feed.get('tags').split(',');
 					
 					if (_.indexOf(t, tags[i]) > -1) {
+						
+						unreadCount += parseInt(feed.get('unread_count'));
+					
+						feedView = this.getFeedItemView(feed).render();
+						tagView.attachFeed(feed);
+						
 						$list.append(
-							$('<li/>').append(this.getFeedItemView(feed).render().el)
+							$('<li/>').append(feedView.el)
 						);
 					}
 					
 				}
-
+				
 				$container.append(
 					$item.append($list)
 				);
