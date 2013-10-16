@@ -51,9 +51,11 @@
 		<aside class="col feeds">
 			<ul>
 				<li class="item">
-					<i class="icon-home"></i>
 					<button type="button" name="feed_id" value="all" data-toggle="filter-source">
-						All items
+						<span class="title">
+							<i class="icon-home"></i>
+							All items
+						</span>
 					</button>
 				</li>
 			</ul>
@@ -109,9 +111,11 @@
 	<button type="button" data-toggle="subnav">
 		<i class="icon-arrow"></i>
 	</button>
-	<button type="button" class="title" data-toggle="filter-source" name="tag" value="<%= name %>">
-		<%- name %>
-		<span class="count"></span>
+	<button type="button" data-toggle="filter-source" name="tag" value="<%= name %>">
+		<span class="title">
+			<%- name %>
+			<span class="count"></span>
+		</span>
 	</button>
 	<div class="actions">
 		<button type="button" data-toggle="edit" title="Edit…">
