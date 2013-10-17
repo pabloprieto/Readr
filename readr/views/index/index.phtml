@@ -63,6 +63,9 @@
 		</aside>
 
 		<aside class="col entries">
+			<div class="search">
+				<input type="search" name="q"/>
+			</div>
 			<ul class="entries-list"></ul>
 			<div class="loading">
 				<img src="<?= $this->basePath('public/img/loading.png') ?>" alt="" class="spin"/>
@@ -95,7 +98,6 @@
 				<label class="form-label">Tags</label>
 				<div class="controls">
 					<input type="text" name="tags"/>
-					<span class="help-block">Separated by commas</span>
 				</div>
 			</div>
 			<div class="error alert-block"></div>

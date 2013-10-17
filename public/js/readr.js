@@ -71,7 +71,7 @@ this.readr = this.readr||{};
 				autocomplete_url: this.options.autocompleteUrl,
 				height:'auto',
 				width:'auto'
-			});
+			}); 
 			return this;
 		},
 
@@ -493,7 +493,8 @@ this.readr = this.readr||{};
 			'click [data-toggle=filter-source]' : 'onFilterSource',
 			'click [data-toggle=mark-read]'     : 'onMarkAsRead',
 			'click [data-toggle=add-feed]'      : 'onAddFeed',
-			'click [data-toggle=collapse]'      : 'onToggleCollapse'
+			'click [data-toggle=collapse]'      : 'onToggleCollapse',
+			'change input[name=q]' : 'onSearch'
 		},
 
 		initialize: function()
@@ -1085,6 +1086,19 @@ this.readr = this.readr||{};
 		{
 			var selector = $(event.currentTarget).attr('data-target');
 			this.toggleCollapse(selector);
+		},
+		
+		onSearch: function(event)
+		{
+			var value = event.currentTarget.value;
+			
+			if (value) {
+				this.params.q = value;
+			} else {
+				delete this.params.q;
+			}
+			
+			this.fetchEntries(true);
 		}
 
 	});
