@@ -391,12 +391,18 @@ this.readr = this.readr||{};
 		setModel: function(model)
 		{
 			this.model = model;
-			this.render();
+			return this;
 		},
 
 		render: function()
 		{
 			this.$el.html(this.template(this.model.attributes));
+			return this;
+		},
+		
+		empty: function()
+		{
+			this.$el.empty();
 			return this;
 		},
 
@@ -416,7 +422,7 @@ this.readr = this.readr||{};
 		routes: {
 			'tag/:tag(/:entry)' : 'tag',
 			'feed/:id(/:entry)' : 'feed',
-			'(:entry)'          : 'default',
+			'(:entry)'          : 'default'
 		},
 
 		initialize: function(options)
@@ -582,6 +588,9 @@ this.readr = this.readr||{};
 			if (!entry) {
 				return;
 			}
+			
+			this.selectEntryItem(entry);
+			this.getEntryView().empty();
 
 			if (entry.get('content') == undefined) {
 				entry.once('change', this.displayEntry, this);
@@ -599,20 +608,12 @@ this.readr = this.readr||{};
 			if (entry.get('read') == 0) {
 				entry.save({read:1}, {patch: true});
 			}
-
-			if (!this.entryView) {
-				this.entryView = new EntryView({
-					el: this.$('.app-body .entry')[0]
-				});
-			}
-
-			this.entryView.$el.scrollTop(0);
-			this.entryView.setModel(entry);
+			
+			var view = this.getEntryView();
+			view.setModel(entry).render();
 
 			var $entries = this.$('.entries');
-			$entries.find('.active').removeClass('active');
-
-			var $item = $entries.find('[data-id=' + entry.id + ']').addClass('active');
+			var $item = $entries.find('[data-id=' + entry.id + ']');
 
 			// Center scroll position to entry if necessary
 			if ($item.length) {
@@ -637,6 +638,13 @@ this.readr = this.readr||{};
 
 			this.listenTo(view, 'select', this.onSelectEntry);
 			this.$('.entries-list').append(view.el);
+		},
+		
+		selectEntryItem: function(entry)
+		{
+			var $entries = this.$('.entries');
+			$entries.find('.active').removeClass('active');
+			$entries.find('[data-id=' + entry.id + ']').addClass('active');
 		},
 
 		updateTitle: function()
@@ -839,6 +847,17 @@ this.readr = this.readr||{};
 			this.listenTo(view, 'edit', this.onEditFeed);
 
 			return view;
+		},
+
+		getEntryView: function()
+		{
+			if (!this.entryView) {
+				this.entryView = new EntryView({
+					el: this.$('.app-body .entry')[0]
+				});
+			}
+			
+			return this.entryView;
 		},
 
 		setMode: function(mode)
