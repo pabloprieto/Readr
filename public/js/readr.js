@@ -64,6 +64,16 @@ this.readr = this.readr||{};
 		{
 			ModalView.prototype.initialize.apply(this);
 		},
+		
+		render: function()
+		{
+			this.$('[name=tags]').tagsInput({
+				autocomplete_url: this.options.autocompleteUrl,
+				height:'auto',
+				width:'auto'
+			});
+			return this;
+		},
 
 		onSubmitAdd: function(event)
 		{
@@ -885,7 +895,9 @@ this.readr = this.readr||{};
 		onAddFeed: function()
 		{
 			if (!this.addModal) {
-				this.addModal = new AddView();
+				this.addModal = new AddView({
+					autocompleteUrl: this.options.apiUrl + '/tags'
+				}).render();
 				this.listenTo(this.addModal, 'added', this.fetchFeeds);
 			}
 
