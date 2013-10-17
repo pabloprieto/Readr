@@ -51,9 +51,11 @@
 		<aside class="col feeds">
 			<ul>
 				<li class="item">
-					<i class="icon-home"></i>
 					<button type="button" name="feed_id" value="all" data-toggle="filter-source">
-						All items
+						<span class="title">
+							<i class="icon-home"></i>
+							All items
+						</span>
 					</button>
 				</li>
 			</ul>
@@ -61,6 +63,9 @@
 		</aside>
 
 		<aside class="col entries">
+			<div class="search">
+				<input type="search" name="q"/>
+			</div>
 			<ul class="entries-list"></ul>
 			<div class="loading">
 				<img src="<?= $this->basePath('public/img/loading.png') ?>" alt="" class="spin"/>
@@ -93,7 +98,6 @@
 				<label class="form-label">Tags</label>
 				<div class="controls">
 					<input type="text" name="tags"/>
-					<span class="help-block">Separated by commas</span>
 				</div>
 			</div>
 			<div class="error alert-block"></div>
@@ -110,7 +114,10 @@
 		<i class="icon-arrow"></i>
 	</button>
 	<button type="button" data-toggle="filter-source" name="tag" value="<%= name %>">
-		<%- name %>
+		<span class="title">
+			<%- name %>
+			<span class="count"></span>
+		</span>
 	</button>
 	<div class="actions">
 		<button type="button" data-toggle="edit" title="Edit…">
@@ -124,7 +131,7 @@
 		<img src="<?= $this->basePath() ?>api/favicon/<%= id %>" class="icon-favicon" alt=""/>
 		<span class="title">
 			<%- title %>
-			<span class="count">(<%= unread_count %>)</span>
+			<span class="count"></span>
 		</span>
 	</button>
 	<div class="actions">
