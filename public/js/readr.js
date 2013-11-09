@@ -54,21 +54,23 @@ this.readr = this.readr||{};
 	var AddView = ModalView.extend({
 
 		el: '#addModal',
+		autocompleteUrl: null,
 		isLoading: false,
 
 		events: {
 			'submit form': 'onSubmitAdd'
 		},
 
-		initialize: function()
+		initialize: function(options)
 		{
+			this.autocompleteUrl = options.autocompleteUrl;
 			ModalView.prototype.initialize.apply(this);
 		},
 		
 		render: function()
 		{
 			this.$('[name=tags]').tagsInput({
-				autocomplete_url: this.options.autocompleteUrl,
+				autocomplete_url: this.autocompleteUrl,
 				height:'auto',
 				width:'auto'
 			}); 
@@ -87,9 +89,9 @@ this.readr = this.readr||{};
 			var feed	 = new Backbone.Model({
 				url: $form.find('[name=url]').val(),
 				tags: $form.find('[name=tags]').val()
-			},{
-				urlRoot: $form.attr('action')
 			});
+			
+			feed.urlRoot = $form.attr('action');
 
 			$form.find('[type=submit]').attr('disabled', true);
 			$form.find('.error').empty();
@@ -113,6 +115,7 @@ this.readr = this.readr||{};
 
 	var FeedEditView = ModalView.extend({
 
+		autocompleteUrl: null,
 		el: '#feedModal',
 		template: null,
 
@@ -121,8 +124,9 @@ this.readr = this.readr||{};
 			'click [data-toggle=delete]': 'onDelete'
 		},
 
-		initialize: function()
+		initialize: function(options)
 		{
+			this.autocompleteUrl = options.autocompleteUrl;
 			this.template = _.template($('#feedForm').html());
 			ModalView.prototype.initialize.apply(this);
 		},
@@ -131,7 +135,7 @@ this.readr = this.readr||{};
 		{
 			this.$el.html(this.template(this.model.attributes));
 			this.$('[name=tags]').tagsInput({
-				autocomplete_url: this.options.autocompleteUrl,
+				autocomplete_url: this.autocompleteUrl,
 				height:'auto',
 				width:'auto'
 			});
@@ -173,6 +177,7 @@ this.readr = this.readr||{};
 	var TagEditView = ModalView.extend({
 
 		el: '#tagModal',
+		name: null,
 		template: null,
 
 		events: {
@@ -188,14 +193,14 @@ this.readr = this.readr||{};
 
 		setTag: function(name)
 		{
-			this.options.name = name;
+			this.name = name;
 			this.render();
 			return this;
 		},
 
 		render: function()
 		{
-			this.$el.html(this.template({name: this.options.name}));
+			this.$el.html(this.template({name: this.name}));
 			return this;
 		},
 
@@ -238,6 +243,7 @@ this.readr = this.readr||{};
 
 		el: '<div class="item tag-item"></div>',
 		feeds: null,
+		name: null,
 		template: null,
 
 		events: {
@@ -245,8 +251,9 @@ this.readr = this.readr||{};
 			'click [data-toggle=edit]': 'onEdit'
 		},
 
-		initialize: function()
+		initialize: function(options)
 		{
+			this.name = options.name;
 			this.template = _.template($('#tagItem').html());
 			this.feeds = new Feeds;
 			this.listenTo(this.feeds, 'remove add change:unread_count', this.updateUnreadCount);
@@ -254,7 +261,7 @@ this.readr = this.readr||{};
 
 		render: function()
 		{
-			this.$el.html(this.template({name: this.options.name}));
+			this.$el.html(this.template({name: this.name}));
 			return this;
 		},
 
@@ -280,13 +287,13 @@ this.readr = this.readr||{};
 			this.$el.parent().toggleClass('collapse').find('ul').slideToggle(200);
 
 			var isCollapsed = this.$el.parent().hasClass('collapse');
-			this.trigger('collapse', this.options.name, isCollapsed);
+			this.trigger('collapse', this.name, isCollapsed);
 		},
 
 		onEdit: function(event)
 		{
 			event.stopImmediatePropagation();
-			this.trigger('edit', this.options.name);
+			this.trigger('edit', this.name);
 		}
 
 	});
@@ -470,6 +477,8 @@ this.readr = this.readr||{};
 
 	var ReadrApp = Backbone.View.extend({
 
+		options: null,
+
 		router: null,
 
 		feeds: null,
@@ -503,9 +512,11 @@ this.readr = this.readr||{};
 			'change input[name=q]' : 'onSearch'
 		},
 
-		initialize: function()
+		initialize: function(options)
 		{
-			Backbone.emulateHTTP = this.options.emulateHTTP;
+			this.options = options;
+		
+			Backbone.emulateHTTP = options.emulateHTTP;
 
 			this.initFeeds();
 			this.initEntries();
@@ -529,18 +540,16 @@ this.readr = this.readr||{};
 
 		initFeeds: function()
 		{
-			this.feeds = new Feeds(this.options.feeds, {
-				url: this.options.apiUrl + '/feeds'
-			});
+			this.feeds = new Feeds(this.options.feeds);
+			this.feeds.url = this.options.apiUrl + '/feeds';
 
 			this.listenTo(this.feeds, 'sync change:tags remove', this.buildFeedsMenu);
 		},
 
 		initEntries: function()
 		{
-			this.entries = new Entries([], {
-				url: this.options.apiUrl + '/entries'
-			});
+			this.entries = new Entries();
+			this.entries.url = this.options.apiUrl + '/entries';
 
 			this.listenTo(this.entries, 'sync', this.onSyncEntries);
 			this.listenTo(this.entries, 'reset', this.onResetEntries);
@@ -618,8 +627,8 @@ this.readr = this.readr||{};
 			// Center scroll position to entry if necessary
 			if ($item.length) {
 				var eh = $entries.height(),
-				    it = $item.position().top,
-				    ih = $item.outerHeight();
+					it = $item.position().top,
+					ih = $item.outerHeight();
 
 				if (it < 0 || it+ih > eh) {
 					var st = $entries.scrollTop() + it - (eh-ih)*0.5;
