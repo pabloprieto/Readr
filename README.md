@@ -29,12 +29,6 @@ Licensed under the GPLv3 license.
 * `f` or `s` : toggle favorite
 * `v` : open the original source in a new window
 
-## Todo
-
-* ~~Responsive design~~
-* Self updating process
-* [Fever](http://www.feedafever.com/api) compatible api
-
 ## Credits
 
 Readr makes use of the following libraries:
@@ -52,6 +46,12 @@ Pablo Prieto, [pabloprieto.net](http://pabloprieto.net/)
 
 ## Changelog
 
+* **v0.9**
+	- New search box
+	- New option to auto delete oldest entries
+* **v0.8**
+	- New autocomplete UI for tags
+	- Export subscriptions as OPML file
 * **v0.7**
 	- 'Emulate HTTP' option added for compatibility with servers that don't support default REST/HTTP approach
 	- Remember expanded/collapsed state in the feeds menu

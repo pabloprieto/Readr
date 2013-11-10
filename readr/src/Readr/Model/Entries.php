@@ -40,6 +40,8 @@ class Entries extends AbstractModel
 			'feeds.title AS feed_title',
 			'GROUP_CONCAT(tags.name,\',\') AS tags'
 		);
+		
+		$where = array();
 
 		if (isset($filters['feed_id'])) {
 			$filters['entries.feed_id'] = $filters['feed_id'];
@@ -50,8 +52,13 @@ class Entries extends AbstractModel
 			$filters['tags.name'] = $filters['tag'];
 			unset($filters['tag']);
 		}
-
-		$where = array();
+		
+		if (isset($filters['q'])) {
+			$value = $this->getDb()->quote('%' . $filters['q'] . '%');
+			$where[] = sprintf("(entries.title LIKE %s OR entries.content LIKE %s)", $value, $value);
+			unset($filters['q']);
+		}
+		
 		foreach ($filters as $name => $value) {
 			$where[] = sprintf("$name = %s", $this->getDb()->quote($value));
 		}
@@ -121,6 +128,16 @@ class Entries extends AbstractModel
 		$statement->execute(array(
 			':favorite' => $favorite,
 			':id'       => $id
+		));
+
+		return $statement->rowCount();
+	}
+	
+	public function deleteAll($date)
+	{
+		$statement = $this->getDb()->prepare("DELETE FROM entries WHERE date < :date");
+		$statement->execute(array(
+			':date' => $date,
 		));
 
 		return $statement->rowCount();

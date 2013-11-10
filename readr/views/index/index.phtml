@@ -16,21 +16,21 @@
 		
 		<div class="group pull-right">
 			
-			<button class="item menu-collapse" data-toggle="collapse" data-target="#options">
+			<button type="button" class="item menu-collapse" data-toggle="collapse" data-target="#options">
 				<i class="icon-settings"></i>
 			</button>
 			
 			<div class="item item-collapse" id="options">
 	
 				<ul class="group nav">
-					<li><button name="read" value="all" data-toggle="filter-status" class="active">All</button></li>
-					<li><button name="read" value="0" data-toggle="filter-status">Unread</button></li>
-					<li><button name="favorite" value="1" data-toggle="filter-status">Favorites</button></li>
-					<li><button data-toggle="mark-read">Mark as read</button></li>
+					<li><button type="button" name="read" value="all" data-toggle="filter-status" class="active">All</button></li>
+					<li><button type="button" name="read" value="0" data-toggle="filter-status">Unread</button></li>
+					<li><button type="button" name="favorite" value="1" data-toggle="filter-status">Favorites</button></li>
+					<li><button type="button" data-toggle="mark-read">Mark as read</button></li>
 				</ul>
 		
 				<ul class="group nav">
-					<li><button data-toggle="add-feed">Add subscription…</button></li>
+					<li><button type="button" data-toggle="add-feed">Add subscription…</button></li>
 				</ul>
 				
 				<ul class="group nav">
@@ -51,9 +51,11 @@
 		<aside class="col feeds">
 			<ul>
 				<li class="item">
-					<button name="feed_id" value="all" data-toggle="filter-source">
-						<i class="icon-home"></i>
-						All items
+					<button type="button" name="feed_id" value="all" data-toggle="filter-source">
+						<span class="title">
+							<i class="icon-home"></i>
+							All items
+						</span>
 					</button>
 				</li>
 			</ul>
@@ -61,9 +63,12 @@
 		</aside>
 
 		<aside class="col entries">
+			<div class="search">
+				<input type="search" name="q"/>
+			</div>
 			<ul class="entries-list"></ul>
 			<div class="loading">
-				<img src="<?= $this->basePath('public/img/loading.gif') ?>" alt=""/>
+				<img src="<?= $this->basePath('public/img/loading.png') ?>" alt="" class="spin"/>
 			</div>
 		</aside>
 
@@ -93,7 +98,6 @@
 				<label class="form-label">Tags</label>
 				<div class="controls">
 					<input type="text" name="tags"/>
-					<span class="help-block">Separated by commas</span>
 				</div>
 			</div>
 			<div class="error alert-block"></div>
@@ -106,25 +110,34 @@
 </div>
 
 <script type="text/template" id="tagItem">
-	<button class="title" data-toggle="filter-source" name="tag" value="<%= name %>">
-		<i class="icon-arrow" data-toggle="subnav"></i>
-		<%- name %>
+	<button type="button" data-toggle="subnav">
+		<i class="icon-arrow"></i>
+	</button>
+	<button type="button" data-toggle="filter-source" name="tag" value="<%= name %>">
+		<span class="title">
+			<%- name %>
+			<span class="count"></span>
+		</span>
 	</button>
 	<div class="actions">
-		<i class="icon-edit" data-toggle="edit" title="Edit..."></i>
+		<button type="button" data-toggle="edit" title="Edit…">
+			<i class="icon-edit"></i>
+		</button>
 	</div>
 </script>
 
 <script type="text/template" id="feedItem">
-	<button class="title" data-toggle="filter-source" name="feed_id" value="<%= id %>">
+	<button type="button" data-toggle="filter-source" name="feed_id" value="<%= id %>">
 		<img src="<?= $this->basePath() ?>api/favicon/<%= id %>" class="icon-favicon" alt=""/>
-		<div class="wrap">
+		<span class="title">
 			<%- title %>
-			<span class="count">(<%= unread_count %>)</span>
-		</div>
+			<span class="count"></span>
+		</span>
 	</button>
 	<div class="actions">
-		<i class="icon-edit" data-toggle="edit" title="Edit..."></i>
+		<button type="button" data-toggle="edit" title="Edit…">
+			<i class="icon-edit"></i>
+		</button>
 	</div>
 </script>
 
@@ -150,7 +163,6 @@
 				<label class="form-label">Tags</label>
 				<div class="controls">
 					<input type="text" name="tags" value="<%- tags %>"/>
-					<span class="help-block">Separated by commas</span>
 				</div>
 			</div>
 			<% if(last_error){ %>
@@ -160,10 +172,10 @@
 			<% } %>
 		</div>
 		<div class="modal-footer">
-				 <div class="pull-left">
-				  <button data-toggle="delete" type="button" class="btn btn-danger">Unsubscribe</button>
-				 </div>
-			<button type="button" data-toggle="close" type="button" class="btn">Cancel</button>
+			<div class="pull-left">
+				<button type="button" data-toggle="delete" class="btn btn-danger">Unsubscribe</button>
+			</div>
+			<button type="button" data-toggle="close" class="btn">Cancel</button>
 			<button type="submit" class="btn btn-primary">Save</button>
 		</div>
 	</form>
@@ -183,10 +195,10 @@
 			</div>
 		</div>
 		<div class="modal-footer">
-				 <div class="pull-left">
-				  <button data-toggle="delete" type="button" class="btn btn-danger">Delete</button>
-				 </div>
-			<button type="button" data-toggle="close" type="button" class="btn">Cancel</button>
+			<div class="pull-left">
+				<button type="button" data-toggle="delete" class="btn btn-danger">Delete</button>
+			</div>
+			<button type="button" data-toggle="close" class="btn">Cancel</button>
 			<button type="submit" class="btn btn-primary">Save</button>
 		</div>
 	</form>
@@ -216,7 +228,7 @@
 			</span>
 			-
 			<% } %>
-			<button data-toggle="filter-source" name="feed_id" value="<%= feed_id %>">
+			<button type="button" data-toggle="filter-source" name="feed_id" value="<%= feed_id %>">
 				<%- feed_title %>
 			</button>
 			-

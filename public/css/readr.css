@@ -1,3 +1,23 @@
+@-webkit-keyframes spin {
+	from { -webkit-transform: rotate(0deg); }
+	to { -webkit-transform: rotate(360deg); }
+}
+
+@-moz-keyframes spin {
+	from { -moz-transform: rotate(0deg); }
+	to { -moz-transform: rotate(360deg); }
+}
+
+@-o-keyframes spin {
+	from { -o-transform: rotate(0deg); }
+	to { -o-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+	from { transform: rotate(0deg); }
+	to { transform: rotate(360deg); }
+}
+
 html {
 	height: 100%;
 }
@@ -22,7 +42,7 @@ h1, h2, h3, h4, h5, h6, p, ul, input, select, textarea, button {
 	list-style: none;
 }
 
-input[type=text], input[type=password], input[type=email], input[type=url], textarea {
+input[type=text], input[type=password], input[type=email], input[type=url], input[type=number], textarea {
 	border: 2px solid #bdc3c7;
 	border-radius: 0;
 	padding: 6px;
@@ -36,9 +56,27 @@ input[type=text], input[type=password], input[type=email], input[type=url], text
 	        box-sizing: border-box;
 }
 
-input[type=text]:focus, input[type=password]:focus, input[type=email]:focus, input[type=url]:focus, textarea:focus {
+input[type=search] {
+	background: url(../img/search.png) no-repeat 5px 5px #fff;
+	padding: 2px 2px 2px 20px;
+	border: 1px solid #bdc3c7;
+	line-height: 1em;
+	-webkit-appearance: textfield;
+	-webkit-box-sizing: border-box;
+	   -moz-box-sizing: border-box;
+	        box-sizing: border-box;
+}
+
+input[type=text]:focus, input[type=password]:focus, input[type=email]:focus, input[type=url]:focus, input[type=number]:focus, input[type=search]:focus, textarea:focus {
 	outline: none;
 	border-color: #818c99;
+}
+
+input.inline {
+	padding: 3px;
+	border-width: 1px;
+	vertical-align: baseline;
+	width: auto;
 }
 
 img {
@@ -62,10 +100,13 @@ button {
 	background: transparent;
 	text-align: left;
 	cursor: pointer;
+	outline: none;
 }
 
-.wrap {
-	overflow: hidden;
+button::-moz-focus-inner {
+	border: none;
+	padding: 0;
+	margin: 0;
 }
 
 .pull-left {
@@ -145,6 +186,12 @@ button {
 	border: 1px solid #b4b4b4;
 }
 
+.spin {
+	-webkit-animation: spin 1s infinite linear;
+	   -moz-animation: spin 1s infinite linear;
+	        animation: spin 1s infinite linear;
+}
+
 .btn {
 	display: inline-block;
 	line-height: 28px;
@@ -153,6 +200,7 @@ button {
 	padding: 0 10px;
 	color: #fff;
 	text-transform: uppercase;
+	text-decoration: none !important;
 }
 
 .btn.active {
@@ -207,6 +255,7 @@ button {
 .app {
 	width: 100%;
 	height: 100%;
+	-webkit-font-smoothing: subpixel-antialiased;
 }
 
 .app-navbar {
@@ -288,6 +337,7 @@ button {
 	top: 40px;
 	bottom: 0;
 	overflow: auto;
+	background: #fff;
 	-webkit-box-sizing: border-box;
 	   -moz-box-sizing: border-box;
 	        box-sizing: border-box;
@@ -296,6 +346,7 @@ button {
 .app-body  > .feeds {
 	left: 0;
 	width: 220px;
+	background: #f1f1f1;
 }
 
 .app-body  > .entries {
@@ -315,18 +366,10 @@ button {
 	right: 0;
 }
 
-.feeds {
-	
-}
-
 .feeds .item {
 	position: relative;
 	line-height: 20px;
 	padding: 5px 24px 5px 5px;
-}
-
-.feeds .tag-item {
-
 }
 
 .feeds .active {
@@ -335,11 +378,6 @@ button {
 
 .feeds ul ul .item {
 	padding-left: 32px;
-}
-
-.feeds .item button {
-	display: block;
-	width: 100%;
 }
 
 .feeds .item .actions {
@@ -354,6 +392,19 @@ button {
 	display: block;
 }
 
+.feeds .item button {
+	vertical-align: top;
+}
+
+.feeds .item .title {
+	display: inline-block;
+	width: 140px;
+}
+
+.feeds .unread .title {
+	font-weight: bold;
+}
+
 .feeds .item .count {
 	display: inline-block;
 	vertical-align: top;
@@ -361,8 +412,7 @@ button {
 }
 
 .feeds .item [class^=icon-] {
-	vertical-align: top;
-	margin-top: 3px;
+	margin-top: 2px;
 }
 
 .feeds .item .icon-arrow {
@@ -382,13 +432,22 @@ button {
 }
 
 .feeds .item .icon-favicon {
-	float: left;
-	margin: 0 4px 0 0;
+	margin: 0;
+	vertical-align: top;
 }
 
 .entries {
 	border-left: 1px solid #BDC3C7;
 	border-right: 1px solid #BDC3C7;
+}
+
+.entries .search {
+	padding: 8px;
+	background: #f1f1f1;
+}
+
+.entries .search input {
+	width: 100%;
 }
 
 .entries li {
@@ -551,6 +610,90 @@ button {
 	margin: 0 auto;
 }
 
+.tagsinput {
+	overflow-y: auto;
+}
+
+.tagsinput .tag {
+	display: inline-block;
+	line-height: 28px;
+	white-space: nowrap;
+	background: #bdc3c7;
+	padding: 0 10px;
+	color: #fff;
+	margin: 0 5px 5px 0;
+}
+
+.tagsinput .tag a {
+	font-weight: bold;
+	text-decoration:none;
+}
+
+.tagsinput input {
+	width:80px;
+	height: 28px;
+	line-height: 28px;
+	margin: 0;
+	padding: 0;
+	border: none;
+	background: transparent;
+	outline: none;
+}
+
+.tagsinput div {
+	display: inline-block;
+}
+
+.ui-helper-hidden-accessible {
+	display: none;
+}
+
+.ui-autocomplete {
+	z-index: 99999;
+	border: 1px solid #BDC3C7;
+	padding: 5px;
+	width: 180px;
+	margin-top: 18px;
+	background: #fff;
+}
+
+.ui-autocomplete::before {
+	content: '';
+	position: absolute;
+	display: inline-block;
+	top: -7px;
+	left: 5px;
+	border-right: 7px solid transparent;
+	border-left: 7px solid transparent;
+	border-bottom: 7px solid #BDC3C7;
+}
+
+.ui-autocomplete::after {
+	content: '';
+	position: absolute;
+	display: inline-block;
+	top: -6px;
+	left: 6px;
+	border-right: 6px solid transparent;
+	border-left: 6px solid transparent;
+	border-bottom: 6px solid #fff;
+}
+
+.ui-autocomplete a {
+	text-decoration: none;
+}
+
+.ui-autocomplete .ui-menu-item a {
+	line-height: 28px;
+	display: block;
+	padding: 0 5px;
+}
+
+.ui-autocomplete .ui-menu-item .ui-state-focus {
+	background: #3498DB;
+	color: #fff;
+}
+
 @media screen and (max-width: 900px) {
 
 	.app-navbar .menu-collapse {
@@ -625,9 +768,12 @@ button {
 		-webkit-transition-property: left;
 		-webkit-transition-duration: 200ms;
 		-webkit-transition-delay: 100ms;
-		-moz-transition-property: left;
-		-moz-transition-duration: 200ms;
-		-moz-transition-delay: 100ms;
+		   -moz-transition-property: left;
+		   -moz-transition-duration: 200ms;
+		   -moz-transition-delay: 100ms;
+		        transition-property: left;
+		        transition-duration: 200ms;
+		        transition-delay: 100ms;
 	}
 	
 	.app-body .feeds {

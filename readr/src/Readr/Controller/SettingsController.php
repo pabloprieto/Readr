@@ -11,6 +11,7 @@ namespace Readr\Controller;
 
 use Readr\App;
 use Readr\Helper\FlashMessenger;
+use Readr\Opml;
 use Readr\Updater;
 
 class SettingsController extends AbstractController
@@ -29,9 +30,10 @@ class SettingsController extends AbstractController
 		$messenger = new FlashMessenger();
 		
 		return array(
-			'errors'      => $messenger->getMessages('error'),
+			'messenger'   => $messenger,
 			'username'    => $settings->get('username'),
 			'emulateHTTP' => $settings->get('emulateHTTP', 0),
+			'deleteAfter' => $settings->get('deleteAfter', null),
 			'release'     => implode('.', App::getRelease()),
 			'version'     => App::getVersion()
 		);
@@ -48,7 +50,7 @@ class SettingsController extends AbstractController
 
 			if (empty($data['password'])) {
 
-				$messenger->add('Password is empty', 'error');
+				$messenger->add('Password is empty', 'auth-error');
 
 			} elseif ($data['password'] == $data['password_confirm']) {
 
@@ -59,7 +61,7 @@ class SettingsController extends AbstractController
 
 			} else {
 
-				$messenger->add('Password and confirmation do not match.', 'error');
+				$messenger->add('Password and confirmation do not match.', 'auth-error');
 
 			}
 
@@ -88,6 +90,13 @@ class SettingsController extends AbstractController
 			$settings->delete('emulateHTTP');
 		}
 		
+		$deleteAfter = intval($data['deleteAfter']);
+		if ($deleteAfter > 0) {
+			$settings->set('deleteAfter', $deleteAfter);
+		} else {
+			$settings->delete('deleteAfter');
+		}
+
 		$this->redirect('settings');
 	}
 	
@@ -115,65 +124,48 @@ class SettingsController extends AbstractController
 
 	public function importAction()
 	{
-		$file = $this->getFile('file');
-
+		$file      = $this->getFile('file');
+		$messenger = new FlashMessenger();
+		
 		if (!$file || $file['error'] > 0) {
+			$messenger->add(sprintf('File \'%s\' has not been correctly uploaded.', $file['name']), 'import-error');
 			$this->redirect('settings');
 		}
 
-		$subscriptions = simplexml_load_file($file['tmp_name']);
-		$this->processOpml($subscriptions->body);
-		$this->updateFeeds();
+		$subscriptions = @simplexml_load_file($file['tmp_name']);
+		if (!$subscriptions || !$subscriptions->body) {
+			$messenger->add(sprintf('\'%s\' is not a valid OPML file.', $file['name']), 'import-error');
+			$this->redirect('settings');
+		}
+		
+		$feeds   = $this->getServiceManager()->get('feeds');
+		$tags    = $this->getServiceManager()->get('tags');
+		$entries = $this->getServiceManager()->get('entries');
+		
+		$opml = new Opml();
+		$opml->process($subscriptions->body, $feeds, $tags);
+
+		$updater = new Updater(
+			$feeds,
+			$entries
+		);
+
+		$updater->update();
 
 		return $this->redirect('');
 	}
-
-	protected function processOpml($xml)
+	
+	public function exportAction()
 	{
-		$title = (string) $xml->attributes()->title;
-
-		foreach ($xml->outline as $outline) {
-
-			$type = (string) $outline->attributes()->type;
-
-			if ($type == 'rss') {
-
-				$feedsModel = $this->getServiceManager()->get('feeds');
-
-				$result = $feedsModel->insert(
-					(string) $outline->attributes()->title,
-					(string) $outline->attributes()->xmlUrl,
-					(string) $outline->attributes()->htmlUrl
-				);
-
-				if ($result && $title) {
-					$tagsModel = $this->getServiceManager()->get('tags');
-					$tagsModel->insert(
-						$title,
-						$feedsModel->lastInsertId()
-					);
-				}
-
-			} else {
-
-				$this->processOpml($outline);
-
-			}
-
-		}
-	}
-
-	protected function updateFeeds()
-	{
-		$feedsModel   = $this->getServiceManager()->get('feeds');
-		$entriesModel = $this->getServiceManager()->get('entries');
-
-		$updater = new Updater(
-			$feedsModel,
-			$entriesModel
-		);
-
-		$updater->update(1000);
+		$feeds = $this->getServiceManager()->get('feeds');
+		
+		$opml = new Opml();
+		$xml  = $opml->create($feeds);
+		
+		header('Content-Type: application/xml');
+		header('Content-Disposition: attachment; filename="subscriptions.xml"');
+		
+		return $xml;
 	}
 
 }
